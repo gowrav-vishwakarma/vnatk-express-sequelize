@@ -32,10 +32,11 @@ module.exports = {
                 }
                 break;
             case 'ENUM':
-                t = { type: 'select', items: field.type.values };
+                t['type'] = 'select';
+                t['items'] = field.type.values;
                 break
             case 'INTEGER':
-                t = { type: 'number' };
+                t['type'] = 'number'
                 if (_.has(field, 'references')) {
                     t.references = field.references;
                     t.association = ModelAssociations[_.findIndex(ModelAssociations, (as) => { return as.foreignKey == field.fieldName })];

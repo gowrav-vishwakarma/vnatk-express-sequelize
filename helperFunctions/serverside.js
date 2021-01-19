@@ -75,7 +75,7 @@ module.exports = {
             field_headers.push({
                 text: fields_info[fld].caption ? fields_info[fld].caption : fields_info[fld].fieldName,
                 value: fields_info[fld].fieldName,
-                sortable: fields_info[fld].sortable ? fields_info[fld].sortable : false
+                sortable: fields_info[fld].sortable ? fields_info[fld].sortable : true
             })
         }
         return field_headers;
@@ -91,7 +91,7 @@ module.exports = {
         id = item[model.primaryKeyAttributes[0]];
         delete item[model.primaryKeyAttributes[0]];
         var where_condition = {};
-        where_condition[Model.primaryKeyAttributes[0]] = id;
+        where_condition[model.primaryKeyAttributes[0]] = id;
         const updated = await model.update(item, { where: where_condition });
         var m_loaded = await model.findByPk(id, readModelOptions);
         return m_loaded;
