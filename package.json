@@ -1,0 +1,34 @@
+{
+    "name": "vnatk-express-sequelize",
+    "description": "VNATK-EXPRESS-SEQUELIZE is express middleware to provide automated backend for VNATK-VUE",
+    "version": "0.0.1",
+    "contributors": [
+        "Gowrav Vishwakarma <gowravvishwakarma@gmail.com>"
+    ],
+    "license": "MIT",
+    "repository": "gowrav-vishwakarma/vnatk-express-sequelize",
+    "dependencies": {
+        "body-parser": "^1.19.0",
+        "cors": "^2.8.5",
+        "debug": "2.6.9",
+        "dotenv": "^8.2.0",
+        "lodash": "^4.17.20",
+        "mysql2": "^2.2.5",
+        "sequelize": "^6.3.5"
+    },
+    "devDependencies": {},
+    "files": [
+        "LICENSE",
+        "README",
+        "index.js",
+        "helperFunctions/clientside.js",
+        "helperFunctions/serverside.js"
+    ],
+    "engines": {
+        "node": ">=10"
+    },
+    "scripts": {
+        "lint": "eslint --plugin markdown --ext js,md .",
+        "test": "mocha --check-leaks --reporter spec --bail"
+    }
+}
