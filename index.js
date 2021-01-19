@@ -36,6 +36,10 @@ module.exports = function (options) {
             if (req.body.allowactions) ModelHeaders = [...ModelHeaders, VNATKServerHelpers.injectActionColumn()];
         }
 
+        const { order, group } = VNATKServerHelpers.setupOrderByGroupBy(req.body.tableoptions.modeloptions, req.body.tableoptions.datatableoptions);
+        console.log(order, group);
+        if (order) req.body.tableoptions.modeloptions.order = order
+
         var data;
         if (req.body.data !== false) {
             // Pginate data

@@ -31,6 +31,34 @@ module.exports = {
         return options;
     },
 
+    setupOrderByGroupBy: function (modeloptions, datatableoptions) {
+        // sortBy: ["City.name", "State.name"], sortDesc: [false, false]
+        var returnValue = { order: false, group: false };
+        if (datatableoptions.sortBy.length) { // ["City.name", "State.name"]
+            returnValue.order = [];
+            for (let i = 0; i < datatableoptions.sortBy.length; i++) {
+                var sortArray = [];
+                const sortBY = datatableoptions.sortBy[i]; // "City.name", "State.name"
+                var t_sortBy = sortBY.split(".").reverse(); // ['name','City']
+                var fieldDone = false;
+                for (let j = 0; j < t_sortBy.length; j++) {
+                    const stringPart = t_sortBy[j]; // "name", "City"
+                    if (!fieldDone) {
+                        if (datatableoptions.sortDesc[i]) sortArray.push("DESC"); // Equivalent sortDesc
+                        sortArray.push(stringPart); // name done... rest should be model relations path only
+                        fieldDone = true;
+                    } else {
+                        sortArray.push({ model: stringPart }) // {model: 'City'}
+                    }
+                }
+                returnValue.order.push(sortArray.reverse());
+            }
+        }
+
+        return returnValue;
+        // return modeloptions;
+    },
+
     getHeaders: function (model, req) {
         var fields = undefined;
         if (req.body.tableoptions && req.body.tableoptions.modeloptions && req.body.tableoptions.modeloptions.attributes) fields = req.body.tableoptions.modeloptions.attributes;
