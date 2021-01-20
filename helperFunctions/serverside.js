@@ -101,7 +101,9 @@ module.exports = {
     },
 
     createNew: async function (model, data, readModelOptions) {
-        const item = await model['create'](data);
+        const item = await model['create'](data).catch(error => {
+            throw error;
+        });
         var m_loaded = await model.findByPk(item[model.primaryKeyAttributes[0]], readModelOptions);
         return m_loaded;
     },
@@ -111,7 +113,9 @@ module.exports = {
         delete item[model.primaryKeyAttributes[0]];
         var where_condition = {};
         where_condition[model.primaryKeyAttributes[0]] = id;
-        const updated = await model.update(item, { where: where_condition });
+        const updated = await model.update(item, { where: where_condition }).catch(error => {
+            throw error;
+        });
         var m_loaded = await model.findByPk(id, readModelOptions);
         return m_loaded;
     },
@@ -163,6 +167,13 @@ module.exports = {
             value: 'vnatk_actions',
             sortable: false
         };
+    },
+
+    getErrorCode(error) {
+        if (error.name == 'SequelizeValidationError') {
+            return 422;
+        }
+        return 500;
     }
 
 }

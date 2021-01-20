@@ -49,12 +49,20 @@ module.exports = function (options) {
                 req.body.tableoptions.modeloptions.limit = limit;
                 req.body.tableoptions.modeloptions.offset = offset;
 
-                data = await model.findAndCountAll(VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models));
-                returnData['datacount'] = data.count;
-                data = data.rows;
+                data = await model.findAndCountAll(VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models)).catch(err => {
+                    res.send(err);
+                    res.end();
+                });
+                if (data) {
+                    returnData['datacount'] = data.count;
+                    data = data.rows;
+                }
             } else {
                 // return all data
-                data = await model.findAll(VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models));
+                data = await model.findAll(VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models)).catch(error => {
+                    res.status(error.status || 500).send(error);
+                    res.end();
+                });
             }
             returnData['data'] = data;
         }
@@ -72,15 +80,29 @@ module.exports = function (options) {
         const model = Models[req.body.model];
 
         if (action.name == 'vnatk_add') {
-            res.send({ row_data: await VNATKServerHelpers.createNew(model, item, VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models)), message: 'Record added successfully' });
+            var cretedRecord = await VNATKServerHelpers.createNew(model, item, VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models)).catch(error => {
+                res.status(VNATKServerHelpers.getErrorCode(error));
+                res.send(error);
+                res.end();
+            });
+            res.send({ row_data: cretedRecord, message: 'Record added successfully' });
             return;
         }
         if (action.name == 'vnatk_edit') {
-            res.send({ row_data: await VNATKServerHelpers.editRecord(model, item, VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models)), message: 'Record edited sucessfully' });
+            var editedData = await VNATKServerHelpers.editRecord(model, item, VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models)).catch(error => {
+                res.status(VNATKServerHelpers.getErrorCode(error));
+                res.send(error);
+                res.end();
+            });
+            res.send({ row_data: editedData, message: 'Record edited sucessfully' });
             return;
         }
         if (action.name == 'vnatk_delete') {
-            var m_loaded = await model.findByPk(item[model.primaryKeyAttributes[0]], VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models));
+            var m_loaded = await model.findByPk(item[model.primaryKeyAttributes[0]], VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models)).catch(error => {
+                res.status(VNATKServerHelpers.getErrorCode(error));
+                res.send(error);
+                res.end();
+            });
             await m_loaded.destroy();
             res.send({ message: 'Record deleted' });
             return;
