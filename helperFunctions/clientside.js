@@ -19,6 +19,8 @@ module.exports = {
             },
                 module.exports.sequliseToFormSchemaType(modelField, ModelAssociations)
             );
+            if (modelField.primaryKey) schema[element].primaryKey = true;
+            if (modelField.isSystem) schema[element].isSystem = true;
         }
         return schema;
     },

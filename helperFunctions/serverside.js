@@ -59,7 +59,8 @@ module.exports = {
         // return modeloptions;
     },
 
-    getHeaders: function (model, req) {
+    getHeadersAndDeRef: function (model, req) {
+        const associations = VNATKClientHelpers.getAssociations(model);
         var fields = undefined;
         if (req.body.tableoptions && req.body.tableoptions.modeloptions && req.body.tableoptions.modeloptions.attributes) fields = req.body.tableoptions.modeloptions.attributes;
 
@@ -72,12 +73,30 @@ module.exports = {
 
         for (let i = 0; i < fields.length; i++) {
             const fld = fields[i];
-            field_headers.push({
-                text: fields_info[fld].caption ? fields_info[fld].caption : fields_info[fld].fieldName,
-                value: fields_info[fld].fieldName,
-                sortable: fields_info[fld].sortable ? fields_info[fld].sortable : true
-            })
+            const assosIndex = associations.findIndex(o => o.foreignKey == fields_info[fld].fieldName);
+            if (req.body.autoderef && assosIndex > -1) {
+                field_headers.push({
+                    text: associations[assosIndex].name.singular,
+                    value: associations[assosIndex].name.singular + '.name', //TODO get titlefield from model
+                    sortable: fields_info[fld].sortable ? fields_info[fld].sortable : true,
+                })
+                // TODO add in model include if not set
+                if (!req.body.tableoptions.modeloptions.include) req.body.tableoptions.modeloptions.include = [];
+                inArrayAsString = req.body.tableoptions.modeloptions.include.includes(associations[assosIndex].name.singular);
+                inArrayAsObjectInclude = req.body.tableoptions.modeloptions.include.findIndex(o => o.model == associations[assosIndex].name.singular);
+                if (!inArrayAsString && inArrayAsObjectInclude == -1) {
+                    req.body.tableoptions.modeloptions.include.push(associations[assosIndex].name.singular);
+                }
+
+            } else {
+                field_headers.push({
+                    text: fields_info[fld].caption ? fields_info[fld].caption : fields_info[fld].fieldName,
+                    value: fields_info[fld].fieldName,
+                    sortable: fields_info[fld].sortable ? fields_info[fld].sortable : true
+                })
+            }
         }
+
         return field_headers;
     },
 
