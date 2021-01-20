@@ -32,9 +32,12 @@ module.exports = function (options) {
         if (req.body.allowdelete) ModelActions = [...ModelActions, ...VNATKServerHelpers.injectDeleteAction(model, req)];
         if (req.body.allowactions) ModelActions = [...ModelActions, ...model.vnAtkGetActions()];
         if (req.body.tableoptions && req.body.tableoptions.headers) {
-            var ModelHeaders = VNATKServerHelpers.getHeaders(model, req);
+            var ModelHeaders = VNATKServerHelpers.getHeadersAndDeRef(model, req);
             if (req.body.allowactions) ModelHeaders = [...ModelHeaders, VNATKServerHelpers.injectActionColumn()];
         }
+
+        const { order, group } = VNATKServerHelpers.setupOrderByGroupBy(req.body.tableoptions.modeloptions, req.body.tableoptions.datatableoptions);
+        if (order) req.body.tableoptions.modeloptions.order = order
 
         var data;
         if (req.body.data !== false) {

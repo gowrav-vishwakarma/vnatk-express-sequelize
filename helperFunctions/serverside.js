@@ -31,7 +31,36 @@ module.exports = {
         return options;
     },
 
-    getHeaders: function (model, req) {
+    setupOrderByGroupBy: function (modeloptions, datatableoptions) {
+        // sortBy: ["City.name", "State.name"], sortDesc: [false, false]
+        var returnValue = { order: false, group: false };
+        if (datatableoptions.sortBy.length) { // ["City.name", "State.name"]
+            returnValue.order = [];
+            for (let i = 0; i < datatableoptions.sortBy.length; i++) {
+                var sortArray = [];
+                const sortBY = datatableoptions.sortBy[i]; // "City.name", "State.name"
+                var t_sortBy = sortBY.split(".").reverse(); // ['name','City']
+                var fieldDone = false;
+                for (let j = 0; j < t_sortBy.length; j++) {
+                    const stringPart = t_sortBy[j]; // "name", "City"
+                    if (!fieldDone) {
+                        if (datatableoptions.sortDesc[i]) sortArray.push("DESC"); // Equivalent sortDesc
+                        sortArray.push(stringPart); // name done... rest should be model relations path only
+                        fieldDone = true;
+                    } else {
+                        sortArray.push({ model: stringPart }) // {model: 'City'}
+                    }
+                }
+                returnValue.order.push(sortArray.reverse());
+            }
+        }
+
+        return returnValue;
+        // return modeloptions;
+    },
+
+    getHeadersAndDeRef: function (model, req) {
+        const associations = VNATKClientHelpers.getAssociations(model);
         var fields = undefined;
         if (req.body.tableoptions && req.body.tableoptions.modeloptions && req.body.tableoptions.modeloptions.attributes) fields = req.body.tableoptions.modeloptions.attributes;
 
@@ -44,12 +73,30 @@ module.exports = {
 
         for (let i = 0; i < fields.length; i++) {
             const fld = fields[i];
-            field_headers.push({
-                text: fields_info[fld].caption ? fields_info[fld].caption : fields_info[fld].fieldName,
-                value: fields_info[fld].fieldName,
-                sortable: fields_info[fld].sortable ? fields_info[fld].sortable : false
-            })
+            const assosIndex = associations.findIndex(o => o.foreignKey == fields_info[fld].fieldName);
+            if (req.body.autoderef && assosIndex > -1) {
+                field_headers.push({
+                    text: associations[assosIndex].name.singular,
+                    value: associations[assosIndex].name.singular + '.name', //TODO get titlefield from model
+                    sortable: fields_info[fld].sortable ? fields_info[fld].sortable : true,
+                })
+                // TODO add in model include if not set
+                if (!req.body.tableoptions.modeloptions.include) req.body.tableoptions.modeloptions.include = [];
+                inArrayAsString = req.body.tableoptions.modeloptions.include.includes(associations[assosIndex].name.singular);
+                inArrayAsObjectInclude = req.body.tableoptions.modeloptions.include.findIndex(o => o.model == associations[assosIndex].name.singular);
+                if (!inArrayAsString && inArrayAsObjectInclude == -1) {
+                    req.body.tableoptions.modeloptions.include.push(associations[assosIndex].name.singular);
+                }
+
+            } else {
+                field_headers.push({
+                    text: fields_info[fld].caption ? fields_info[fld].caption : fields_info[fld].fieldName,
+                    value: fields_info[fld].fieldName,
+                    sortable: fields_info[fld].sortable ? fields_info[fld].sortable : true
+                })
+            }
         }
+
         return field_headers;
     },
 
@@ -63,7 +110,7 @@ module.exports = {
         id = item[model.primaryKeyAttributes[0]];
         delete item[model.primaryKeyAttributes[0]];
         var where_condition = {};
-        where_condition[Model.primaryKeyAttributes[0]] = id;
+        where_condition[model.primaryKeyAttributes[0]] = id;
         const updated = await model.update(item, { where: where_condition });
         var m_loaded = await model.findByPk(id, readModelOptions);
         return m_loaded;
