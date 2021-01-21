@@ -51,7 +51,7 @@ module.exports = {
                 t = { type: 'text' };
                 break;
         }
-
+        if (field.validate) t.validate = field.validate;
         return t;
     },
 

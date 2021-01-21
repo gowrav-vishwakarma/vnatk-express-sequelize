@@ -80,13 +80,13 @@ module.exports = function (options) {
         const model = Models[req.body.model];
 
         if (action.name == 'vnatk_add') {
-            var cretedRecord = await VNATKServerHelpers.createNew(model, item, VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models)).catch(error => {
+            VNATKServerHelpers.createNew(model, item, VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models)).then((cretedRecord) => {
+                res.send({ row_data: cretedRecord, message: 'Record added successfully' });
+            }).catch(error => {
                 res.status(VNATKServerHelpers.getErrorCode(error));
                 res.send(error);
                 res.end();
             });
-            res.send({ row_data: cretedRecord, message: 'Record added successfully' });
-            return;
         }
         if (action.name == 'vnatk_edit') {
             var editedData = await VNATKServerHelpers.editRecord(model, item, VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models)).catch(error => {
