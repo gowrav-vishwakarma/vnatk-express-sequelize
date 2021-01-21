@@ -52,6 +52,7 @@ module.exports = {
                 break;
         }
         if (field.validate) t.validate = field.validate;
+        if (field.defaultValue) t.defaultValue = field.defaultValue;
         return t;
     },
 
