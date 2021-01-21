@@ -19,6 +19,8 @@ module.exports = {
             },
                 module.exports.sequliseToFormSchemaType(modelField, ModelAssociations)
             );
+            if (modelField.primaryKey) schema[element].primaryKey = true;
+            if (modelField.isSystem) schema[element].isSystem = true;
         }
         return schema;
     },
@@ -32,10 +34,11 @@ module.exports = {
                 }
                 break;
             case 'ENUM':
-                t = { type: 'select', items: field.type.values };
+                t['type'] = 'select';
+                t['items'] = field.type.values;
                 break
             case 'INTEGER':
-                t = { type: 'number' };
+                t['type'] = 'number'
                 if (_.has(field, 'references')) {
                     t.references = field.references;
                     t.association = ModelAssociations[_.findIndex(ModelAssociations, (as) => { return as.foreignKey == field.fieldName })];
@@ -48,7 +51,8 @@ module.exports = {
                 t = { type: 'text' };
                 break;
         }
-
+        if (field.validate) t.validate = field.validate;
+        if (field.defaultValue) t.defaultValue = field.defaultValue;
         return t;
     },
 

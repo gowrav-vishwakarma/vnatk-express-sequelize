@@ -32,9 +32,12 @@ module.exports = function (options) {
         if (req.body.allowdelete) ModelActions = [...ModelActions, ...VNATKServerHelpers.injectDeleteAction(model, req)];
         if (req.body.allowactions) ModelActions = [...ModelActions, ...model.vnAtkGetActions()];
         if (req.body.tableoptions && req.body.tableoptions.headers) {
-            var ModelHeaders = VNATKServerHelpers.getHeaders(model, req);
+            var ModelHeaders = VNATKServerHelpers.getHeadersAndDeRef(model, req);
             if (req.body.allowactions) ModelHeaders = [...ModelHeaders, VNATKServerHelpers.injectActionColumn()];
         }
+
+        const { order, group } = VNATKServerHelpers.setupOrderByGroupBy(req.body.tableoptions.modeloptions, req.body.tableoptions.datatableoptions);
+        if (order) req.body.tableoptions.modeloptions.order = order
 
         var data;
         if (req.body.data !== false) {
@@ -46,12 +49,20 @@ module.exports = function (options) {
                 req.body.tableoptions.modeloptions.limit = limit;
                 req.body.tableoptions.modeloptions.offset = offset;
 
-                data = await model.findAndCountAll(VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models));
-                returnData['datacount'] = data.count;
-                data = data.rows;
+                data = await model.findAndCountAll(VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models)).catch(err => {
+                    res.send(err);
+                    res.end();
+                });
+                if (data) {
+                    returnData['datacount'] = data.count;
+                    data = data.rows;
+                }
             } else {
                 // return all data
-                data = await model.findAll(VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models));
+                data = await model.findAll(VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models)).catch(error => {
+                    res.status(error.status || 500).send(error);
+                    res.end();
+                });
             }
             returnData['data'] = data;
         }
@@ -69,15 +80,29 @@ module.exports = function (options) {
         const model = Models[req.body.model];
 
         if (action.name == 'vnatk_add') {
-            res.send({ row_data: await VNATKServerHelpers.createNew(model, item, VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models)), message: 'Record added successfully' });
-            return;
+            VNATKServerHelpers.createNew(model, item, VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models)).then((cretedRecord) => {
+                res.send({ row_data: cretedRecord, message: 'Record added successfully' });
+            }).catch(error => {
+                res.status(VNATKServerHelpers.getErrorCode(error));
+                res.send(error);
+                res.end();
+            });
         }
         if (action.name == 'vnatk_edit') {
-            res.send({ row_data: await VNATKServerHelpers.editRecord(model, item, VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models)), message: 'Record edited sucessfully' });
+            var editedData = await VNATKServerHelpers.editRecord(model, item, VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models)).catch(error => {
+                res.status(VNATKServerHelpers.getErrorCode(error));
+                res.send(error);
+                res.end();
+            });
+            res.send({ row_data: editedData, message: 'Record edited sucessfully' });
             return;
         }
         if (action.name == 'vnatk_delete') {
-            var m_loaded = await model.findByPk(item[model.primaryKeyAttributes[0]], VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models));
+            var m_loaded = await model.findByPk(item[model.primaryKeyAttributes[0]], VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models)).catch(error => {
+                res.status(VNATKServerHelpers.getErrorCode(error));
+                res.send(error);
+                res.end();
+            });
             await m_loaded.destroy();
             res.send({ message: 'Record deleted' });
             return;
@@ -85,7 +110,10 @@ module.exports = function (options) {
 
         // is it for : Single, multiple, none, all
         var m_loaded = await model.findByPk(item[model.primaryKeyAttributes[0]], VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models));
-        m_loaded[action.execute]();
+        if (action.formschema)
+            m_loaded[action.execute](req.body.formdata);
+        else
+            m_loaded[action.execute]();
 
         res.send({ row_data: m_loaded });
     })
