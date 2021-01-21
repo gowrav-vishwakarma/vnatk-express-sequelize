@@ -110,7 +110,10 @@ module.exports = function (options) {
 
         // is it for : Single, multiple, none, all
         var m_loaded = await model.findByPk(item[model.primaryKeyAttributes[0]], VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models));
-        m_loaded[action.execute]();
+        if (action.formschema)
+            m_loaded[action.execute](req.body.formdata);
+        else
+            m_loaded[action.execute]();
 
         res.send({ row_data: m_loaded });
     })
