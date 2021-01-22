@@ -68,12 +68,84 @@ $yourProjectRoot/server> npm install --save bcrypt body-parser cookie-parser exp
 
 ### If required vnatk-express-sequelize can be installed in existing express seuelize setup also with very ease
 
+#install sequelize cli for easy sequlize setup
+$yourProjectRoot/server> npm install --save-dev sequelize-cli
+$yourProjectRoot/server> sequelize init
+
 ```
 ## Step 1.1: setup configurations
 
-open ```config/config.json``` file and replace ```operatorsAliases``` value from false to the follwoing
+sequlize init creates ```config/config.json``` file but we need env access to config also rename ```config/config.json``` to ```config/config.js```
+
+and replace the follwoing content in this js file
+
+```js
+require('dotenv').config();
+const sequelize = require('sequelize')
+const Op = sequelize.Op
+
+module.exports = {
+    "development": {
+        "username": process.env.DB_USER_NAME || "root",
+        "password": process.env.DB_PASSWORD || "winserver",
+        "database": process.env.DB_DATABASE || "frendy_service_user",
+        "host": process.env.DB_HOST || "127.0.0.1",
+        "dialect": "mysql",
+        operatorsAliases: { $lt: Op.lt, $gt: Op.gt, $like: Op.like },
+        "dialectOptions": {
+            "dateStrings": true,
+            "typeCast": true
+        },
+        "timezone": '+05:30'
+    },
+    "test": {
+        "username": "root",
+        "password": null,
+        "database": "database_test",
+        "host": "127.0.0.1",
+        "dialect": "mysql",
+        "operatorsAliases": false,
+        "dialectOptions": {
+            "useUTC": false, //for reading from database
+            "dateStrings": true,
+            "typeCast": true
+        },
+        "timezone": '+05:30'
+    },
+    "production": {
+        "username": process.env.DB_USER_NAME || "root",
+        "password": process.env.DB_PASSWORD || null,
+        "database": process.env.DB_DATABASE || null,
+        "host": process.env.DB_HOST || "127.0.0.1",
+        "port": process.env.DB_PORT || "3306",
+        "dialect": "mysql",
+        "operatorsAliases": false,
+        "dialectOptions": {
+            "useUTC": false, //for reading from database
+            "dateStrings": true,
+            "typeCast": true
+        },
+        "timezone": '+05:30'
+    }
+}
 ```
-operatorsAliases: { $lt: Op.lt, $gt: Op.gt, $like: Op.like },
+since we changed json file to js, sequlize's default ```model/index.js``` file needs a change too, open this file and change 
+
+```js
+# some where at top replace config const declaration with the below line, look at 'json' removed
+const config = require(__dirname + '/../config/config')[env];
+
+```
+
+sometimes sequelize have issues in reading models from file like this specially if your sequlize cli is old and you are  using seulize v6, in case of that you may get sequelize import method error.
+
+replace following line in that case
+
+```js
+// replace following line to 
+const model = sequelize['import'](path.join(__dirname, file));
+// this line
+    const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes)
 ```
 
 ## Step 1.2: configure and use vnatk-express-sequelize
@@ -82,6 +154,7 @@ Please add the following code in your app.js
 ```javascript
 // somewhere on the top after 
 // var express = require('express'); <= after this line
+var cors = require('cors');
 const bodyParser = require('body-parser');
 const vnatk = require('vnatk-express-sequelize');
 ...
@@ -89,6 +162,9 @@ const vnatk = require('vnatk-express-sequelize');
 // You can already have body-parser added, no need to add again
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: true }));
+
+// add cors is a good way and mostly you might need this also
+app.use(cors()); // Use this after the variable declaration
 
 
 const Models = require('./models');
