@@ -20,35 +20,38 @@ module.exports = function (options) {
     const Models = options.Models;
     const router = options.router;
 
-    router.post('/init', async function (req, res, next) {
+    router.post('/crud', async function (req, res, next) {
         const model = Models[req.body.model];
 
-        var ModelActions = [];
-
-        var returnData = {};
-
-        if (req.body.allowadd) ModelActions = [...ModelActions, ...VNATKServerHelpers.injectAddAction(model, req)];
-        if (req.body.allowedit) ModelActions = [...ModelActions, ...VNATKServerHelpers.injectEditAction(model, req)];
-        if (req.body.allowdelete) ModelActions = [...ModelActions, ...VNATKServerHelpers.injectDeleteAction(model, req)];
-        if (req.body.allowactions) ModelActions = [...ModelActions, ...model.vnAtkGetActions()];
-        if (req.body.tableoptions && req.body.tableoptions.headers) {
-            var ModelHeaders = VNATKServerHelpers.getHeadersAndDeRef(model, req);
-            if (req.body.allowactions) ModelHeaders = [...ModelHeaders, VNATKServerHelpers.injectActionColumn()];
+        if (req.body.retrive && req.body.retrive.modelscope !== undefined) {
+            if (req.body.retrive.modelscope == false) model.unscoped();
+            if (typeof req.body.retrive.modelscope === 'string') model.scope(req.body.retrive.modelscope);
         }
 
-        const { order, group } = VNATKServerHelpers.setupOrderByGroupBy(req.body.tableoptions.modeloptions, req.body.tableoptions.datatableoptions);
-        if (order) req.body.tableoptions.modeloptions.order = order
+        var ModelActions = [];
+        var returnData = {};
+        if (req.body.create !== false) ModelActions = [...ModelActions, ...VNATKServerHelpers.injectAddAction(model, req)];
+        if (req.body.update !== false) ModelActions = [...ModelActions, ...VNATKServerHelpers.injectEditAction(model, req)];
+        if (req.body.delete !== false) ModelActions = [...ModelActions, ...VNATKServerHelpers.injectDeleteAction(model, req)];
+        if (req.body.actions) ModelActions = [...ModelActions, ...model.vnAtkGetActions()];
+        if (req.body.retrive && req.body.retrive.headers) {
+            var ModelHeaders = VNATKServerHelpers.getHeadersAndDeRef(model, req);
+            if (req.body.actions) ModelHeaders = [...ModelHeaders, VNATKServerHelpers.injectActionColumn()];
+        }
+
+        const { order, group } = VNATKServerHelpers.setupOrderByGroupBy(req.body.retrive.modeloptions, req.body.retrive.uioptions);
+        if (order) req.body.retrive.modeloptions.order = order
 
         var data;
-        if (req.body.data !== false) {
-            const senitizedmodeloptions = VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models);
+        if (req.body.retrive.data !== false) {
+            const senitizedmodeloptions = VNATKServerHelpers.senitizeModelOptions(req.body.retrive.modeloptions, model, Models);
             // Pginate data
-            if (req.body.tableoptions.serversidepagination) {
-                const limit = req.body.tableoptions.datatableoptions.itemsPerPage ? req.body.tableoptions.datatableoptions.itemsPerPage : 25;
-                const offset = ((req.body.tableoptions.datatableoptions.page ? req.body.tableoptions.datatableoptions.page : 1) - 1) * limit;
+            if (req.body.retrive.serversidepagination) {
+                const limit = req.body.retrive.uioptions.itemsPerPage ? req.body.retrive.uioptions.itemsPerPage : 25;
+                const offset = ((req.body.retrive.uioptions.page ? req.body.retrive.uioptions.page : 1) - 1) * limit;
 
-                req.body.tableoptions.modeloptions.limit = limit;
-                req.body.tableoptions.modeloptions.offset = offset;
+                req.body.retrive.modeloptions.limit = limit;
+                req.body.retrive.modeloptions.offset = offset;
 
                 data = await model.findAndCountAll(senitizedmodeloptions).catch(err => {
                     res.send(err);
@@ -68,8 +71,8 @@ module.exports = function (options) {
             returnData['data'] = data;
         }
 
-        if (req.body.tableoptions && req.body.tableoptions.headers) returnData['headers'] = ModelHeaders;
-        if (req.body.allowactions) returnData['actions'] = ModelActions;
+        if (req.body.retrive && req.body.retrive.headers) returnData['headers'] = ModelHeaders;
+        if (req.body.actions) returnData['actions'] = ModelActions;
 
         res.send(returnData);
     });
@@ -79,7 +82,11 @@ module.exports = function (options) {
         const item = req.body.arg_item;
 
         const model = Models[req.body.model];
-        const senitizedmodeloptions = VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models);
+        if (req.body.retrive && req.body.retrive.modelscope !== undefined) {
+            if (req.body.retrive.modelscope == false) model.unscoped();
+            if (typeof req.body.retrive.modelscope === 'string') model.scope(req.body.retrive.modelscope);
+        }
+        const senitizedmodeloptions = VNATKServerHelpers.senitizeModelOptions(req.body.retrive.modeloptions, model, Models);
 
 
         if (action.name == 'vnatk_add') {
@@ -121,12 +128,12 @@ module.exports = function (options) {
         res.send({ row_data: m_loaded });
     })
 
-    router.post('/list', async function (req, res, next) {
-        const model = Models[req.body.model];
-        const senitizedmodeloptions = VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models);
-        const data = await model.findAll(senitizedmodeloptions);
-        res.send(data);
-    })
+    // router.post('/autocomplete', async function (req, res, next) {
+    //     const model = Models[req.body.model];
+    //     const senitizedmodeloptions = VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models);
+    //     const data = await model.findAll(senitizedmodeloptions);
+    //     res.send(data);
+    // })
 
     return router;
 };

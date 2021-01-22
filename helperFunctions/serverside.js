@@ -34,7 +34,8 @@ module.exports = {
     setupOrderByGroupBy: function (modeloptions, datatableoptions) {
         // sortBy: ["City.name", "State.name"], sortDesc: [false, false]
         var returnValue = { order: false, group: false };
-        if (datatableoptions.sortBy.length) { // ["City.name", "State.name"]
+        if (datatableoptions === undefined) return returnValue;
+        if (datatableoptions.sortBy && datatableoptions.sortBy.length) { // ["City.name", "State.name"]
             returnValue.order = [];
             for (let i = 0; i < datatableoptions.sortBy.length; i++) {
                 var sortArray = [];
@@ -62,7 +63,7 @@ module.exports = {
     getHeadersAndDeRef: function (model, req) {
         const associations = VNATKClientHelpers.getAssociations(model);
         var fields = undefined;
-        if (req.body.tableoptions && req.body.tableoptions.modeloptions && req.body.tableoptions.modeloptions.attributes) fields = req.body.tableoptions.modeloptions.attributes;
+        if (req.body.retrive && req.body.retrive.modeloptions && req.body.retrive.modeloptions.attributes) fields = req.body.retrive.modeloptions.attributes;
 
         var fields_info = model.rawAttributes;
         if (!fields || fields == undefined || fields == null || fields == '' || fields == '*' || fields.length == 0) {
@@ -75,24 +76,26 @@ module.exports = {
             const fld = fields[i];
             const assosIndex = associations.findIndex(o => o.foreignKey == fields_info[fld].fieldName);
             if (req.body.autoderef && assosIndex > -1) {
+                // ASSOCIATION found, belongsTo field
                 field_headers.push({
                     text: associations[assosIndex].name.singular,
                     value: associations[assosIndex].name.singular + '.name', //TODO get titlefield from model
                     sortable: fields_info[fld].sortable ? fields_info[fld].sortable : true,
                 })
                 // TODO add in model include if not set
-                if (!req.body.tableoptions.modeloptions.include) req.body.tableoptions.modeloptions.include = [];
-                inArrayAsString = req.body.tableoptions.modeloptions.include.includes(associations[assosIndex].name.singular);
-                inArrayAsObjectInclude = req.body.tableoptions.modeloptions.include.findIndex(o => o.model == associations[assosIndex].name.singular);
+                if (!req.body.retrive.modeloptions.include) req.body.retrive.modeloptions.include = [];
+                inArrayAsString = req.body.retrive.modeloptions.include.includes(associations[assosIndex].name.singular);
+                inArrayAsObjectInclude = req.body.retrive.modeloptions.include.findIndex(o => o.model == associations[assosIndex].name.singular);
                 if (!inArrayAsString && inArrayAsObjectInclude == -1) {
-                    req.body.tableoptions.modeloptions.include.push(associations[assosIndex].name.singular);
+                    req.body.retrive.modeloptions.include.push(associations[assosIndex].name.singular);
                 }
 
             } else {
                 field_headers.push({
                     text: fields_info[fld].caption ? fields_info[fld].caption : fields_info[fld].fieldName,
                     value: fields_info[fld].fieldName,
-                    sortable: fields_info[fld].sortable ? fields_info[fld].sortable : true
+                    sortable: fields_info[fld].sortable ? fields_info[fld].sortable : true,
+                    primaryKey: fields_info[fld].primaryKey ? true : undefined
                 })
             }
         }
@@ -122,7 +125,7 @@ module.exports = {
 
     injectAddAction: function (model, req) {
         var addFields = undefined;
-        if (req.body.addoptions && req.body.addoptions.modeloptions && req.body.addoptions.modeloptions.attributes) addFields = req.body.addoptions.modeloptions.attributes;
+        if (req.body.create && req.body.create.modeloptions && req.body.create.modeloptions.attributes) addFields = req.body.create.modeloptions.attributes;
         var addAction = {
             name: 'vnatk_add',
             caption: 'Add',
@@ -134,7 +137,7 @@ module.exports = {
 
     injectEditAction: function (model, req) {
         var editFields = undefined;
-        if (req.body.editoptions && req.body.editoptions.modeloptions && req.body.editoptions.modeloptions.attributes) editFields = req.body.editoptions.modeloptions.attributes;
+        if (req.body.update && req.body.update.modeloptions && req.body.update.modeloptions.attributes) editFields = req.body.update.modeloptions.attributes;
         var editAction = {
             name: 'vnatk_edit',
             caption: 'Edit',
