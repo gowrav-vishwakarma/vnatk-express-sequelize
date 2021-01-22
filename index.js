@@ -41,6 +41,7 @@ module.exports = function (options) {
 
         var data;
         if (req.body.data !== false) {
+            const senitizedmodeloptions = VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models);
             // Pginate data
             if (req.body.tableoptions.serversidepagination) {
                 const limit = req.body.tableoptions.datatableoptions.itemsPerPage ? req.body.tableoptions.datatableoptions.itemsPerPage : 25;
@@ -49,7 +50,7 @@ module.exports = function (options) {
                 req.body.tableoptions.modeloptions.limit = limit;
                 req.body.tableoptions.modeloptions.offset = offset;
 
-                data = await model.findAndCountAll(VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models)).catch(err => {
+                data = await model.findAndCountAll(senitizedmodeloptions).catch(err => {
                     res.send(err);
                     res.end();
                 });
@@ -59,7 +60,7 @@ module.exports = function (options) {
                 }
             } else {
                 // return all data
-                data = await model.findAll(VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models)).catch(error => {
+                data = await model.findAll(senitizedmodeloptions).catch(error => {
                     res.status(error.status || 500).send(error);
                     res.end();
                 });
@@ -78,9 +79,11 @@ module.exports = function (options) {
         const item = req.body.arg_item;
 
         const model = Models[req.body.model];
+        const senitizedmodeloptions = VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models);
+
 
         if (action.name == 'vnatk_add') {
-            VNATKServerHelpers.createNew(model, item, VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models)).then((cretedRecord) => {
+            VNATKServerHelpers.createNew(model, item, senitizedmodeloptions).then((cretedRecord) => {
                 res.send({ row_data: cretedRecord, message: 'Record added successfully' });
             }).catch(error => {
                 res.status(VNATKServerHelpers.getErrorCode(error));
@@ -89,7 +92,7 @@ module.exports = function (options) {
             });
         }
         if (action.name == 'vnatk_edit') {
-            var editedData = await VNATKServerHelpers.editRecord(model, item, VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models)).catch(error => {
+            var editedData = await VNATKServerHelpers.editRecord(model, item, senitizedmodeloptions).catch(error => {
                 res.status(VNATKServerHelpers.getErrorCode(error));
                 res.send(error);
                 res.end();
@@ -98,7 +101,7 @@ module.exports = function (options) {
             return;
         }
         if (action.name == 'vnatk_delete') {
-            var m_loaded = await model.findByPk(item[model.primaryKeyAttributes[0]], VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models)).catch(error => {
+            var m_loaded = await model.findByPk(item[model.primaryKeyAttributes[0]], senitizedmodeloptions).catch(error => {
                 res.status(VNATKServerHelpers.getErrorCode(error));
                 res.send(error);
                 res.end();
@@ -109,7 +112,7 @@ module.exports = function (options) {
         }
 
         // is it for : Single, multiple, none, all
-        var m_loaded = await model.findByPk(item[model.primaryKeyAttributes[0]], VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models));
+        var m_loaded = await model.findByPk(item[model.primaryKeyAttributes[0]], senitizedmodeloptions);
         if (action.formschema)
             m_loaded[action.execute](req.body.formdata);
         else
@@ -120,7 +123,8 @@ module.exports = function (options) {
 
     router.post('/list', async function (req, res, next) {
         const model = Models[req.body.model];
-        const data = await model.findAll(VNATKServerHelpers.senitizeModelOptions(req.body.modeloptions, model, Models));
+        const senitizedmodeloptions = VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models);
+        const data = await model.findAll(senitizedmodeloptions);
         res.send(data);
     })
 
