@@ -1,21 +1,39 @@
-# WARNING - ALPHA VERSION : This line will be removed when production ready. DO NOT USE RIGHT NOW, OPTIONS MAY CHANGE (Last updated Jan 22, 2021)
+# BETA
+---
+
+
 ## VNATK
-VNATK is a set of client and server frameworks to get your work started ASAP. Also we all know how tesdius it is to do maintenance of any project specially when client/company is ever changing their requirements. By looking at those issue I was missing somehting that really is fast.
+
+VNATK is a set of client and server frameworks set to get your work started ASAP. Also we all know how tesdius it is to do maintenance of any project specially when client/company is ever changing their requirements. By looking at those issue I was missing somehting that really is fast, really RAPID APPLICATION DEVELOPMENT (RAD) framework.
 
 So, here we are with two sets of frameworks, this VNATK-VUE and VNATK-EXPRESS-SEQULIZE.
 
 Both repository contains same README file so pls follow proper link to go to respective repository.
 
-Link to VUEATK-VUE 
+Link to [VUEATK-VUE] (https://github.com/gowrav-vishwakarma/vnatk-vue) 
 
-Link to VUEATK-EXPRESS-SEQUELIZE 
-# VNATK-VUE (FrontEnd with Vue, Vuetify)
-VNATKVUE is Frontend part of VNATK (Vue Node AgileTool Kit). Making app development easy by including some best practices as integral part, yet, giving you total customization options.
-
-Dependencies: Vue (2.\*), Vuetify(2.\*), vue-form-base
+Link to [VUEATK-EXPRESS-SEQUELIZE] (https://github.com/gowrav-vishwakarma/vnatk-express-sequelize) 
 
 # VNATK-EXPRESS-SEQULIZE (Backend with Express and Squelize)
-This express middleware will give all the fule required from server to this Frontend Repo. 
+---
+
+equipped with a few endpoints that gives you all power with SequalizedSQL (pronounced `sec-QL`) developed by this project.
+
+This express middleware will give all the fule required from server to VNATK Frontend Frameworks. 
+
+
+Dependencies: body-parser, debug, dotenv,lodash, mysql2, sequelize
+
+
+# VNATK-VUE (FrontEnd with Vue, Vuetify)
+---
+
+VNATKVUE is Frontend part of VNATK (Vue Node AgileTool Kit). Making app development easy by including some best practices as integral part, yet, giving you total customization options.
+
+
+Dependencies: Vue (2.\*), Vuetify(2.\*), vue-form-base, lodash, dotenv
+
+
 
 ## Getting started
 
@@ -74,11 +92,11 @@ $yourProjectRoot/server> npm install --save-dev sequelize-cli
 $yourProjectRoot/server> sequelize init
 
 ```
-## Step 1.1: setup configurations
+## Step 1.1: express app configurations
 
 sequlize init creates ```config/config.json``` file but we need env access to config also rename ```config/config.json``` to ```config/config.js```
 
-and replace the follwoing content in this js file
+and REPLACE the follwoing content in `config/config.js` file (Complete content copy paste)
 
 ```js
 require('dotenv').config();
@@ -88,8 +106,8 @@ const Op = sequelize.Op
 module.exports = {
     "development": {
         "username": process.env.DB_USER_NAME || "root",
-        "password": process.env.DB_PASSWORD || "winserver",
-        "database": process.env.DB_DATABASE || "frendy_service_user",
+        "password": process.env.DB_PASSWORD || null",
+        "database": process.env.DB_DATABASE || "your_awasome_db_name",
         "host": process.env.DB_HOST || "127.0.0.1",
         "dialect": "mysql",
         operatorsAliases: { $lt: Op.lt, $gt: Op.gt, $like: Op.like },
@@ -134,24 +152,26 @@ since we changed json file to js, sequlize's default ```model/index.js``` file n
 
 ```js
 # some where at top replace config const declaration with the below line, look at 'json' removed
+
 const config = require(__dirname + '/../config/config')[env];
 
 ```
 
-sometimes sequelize have issues in reading models from file like this specially if your sequlize cli is old and you are  using seulize v6, in case of that you may get sequelize import method error.
+sometimes sequelize have issues in reading models from file like this specially if your sequlize cli is old and you are  using seulize v6, in case of that, you may get sequelize import method error.
 
 replace following line in that case
 
 ```js
-// replace following line to 
+// replace following line 
 const model = sequelize['import'](path.join(__dirname, file));
-// this line
+//  to this line
     const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes)
 ```
 
 ## Step 1.2: configure and use vnatk-express-sequelize
 
-Please add the following code in your app.js 
+Please add the following code in your `app.js` file. (DON'T COPY PASTE WHOLE FILE) 
+
 ```javascript
 // somewhere on the top after 
 // var express = require('express'); <= after this line
@@ -176,9 +196,9 @@ app.use('/crud', vnatk({ // "/crud" will be your base path where the system will
 ```
 ### Step 1.3: setup Models
 
-Create models in ```models``` folder
+Create models in ```models``` folder. For more about Models in sequlize please follow sequlize documentations.
 
-Let's have a sample model. Please read Model comments as documentation
+Let's have a sample model. Please read Model comments as documentation. Some properties and methods are specific to VNATK.
 
 
 ```javascript
@@ -189,12 +209,12 @@ module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
       // define association here
-      // THAT FILE'S CODE IS NOT PASTED HERE. 
+      // City and State Models must be created in same manner in models folder also
       User.belongsTo(models.City, { foreignKey: 'city_id' });
       User.belongsTo(models.State, { foreignKey: 'state_id' });
 
     }
-    // you have to create this STATIC functionin your model to tell what type of actions are doable on any model
+    // you have to create this STATIC function in your model to tell what type of actions are doable on any model
     static vnAtkGetActions(models) {
       return [
         {
@@ -281,9 +301,8 @@ module.exports = (sequelize, DataTypes) => {
       })
     }
 
-    // block action is defined with formschema and will receive that in formdata when submitted
+    // block action is defined with formschema in above vnAtkGetActions method and will receive that in formdata when submitted with record that is being executed with this method.
     block(formdata) {
-      // console.log(formdata);
       this.status = 'Blocked'
       return this.save().then(self => {
         return self;
@@ -292,7 +311,7 @@ module.exports = (sequelize, DataTypes) => {
 
   }
 
-  // This init method is defined by 'define' method in other way. technically its same ...
+  // This init method is defined by 'define' method in other sequelize ways. technically its same ...
 
   User.init(
     {
@@ -317,16 +336,18 @@ module.exports = (sequelize, DataTypes) => {
       },
       password: {
         type: DataTypes.STRING,
-        ext: 'password' // VNATK
+        ext: 'password' // VNATK Specific, for more ext please look at vue-form-base schemas system
       },
       status: DataTypes.ENUM('Applied', 'Active', 'InActive', 'Blocked'),
       createdAt: {
         type: DataTypes.DATE,
         field: 'created_at'
+        isSystem:true // VNATK- isSystem will not be displayed default in Table or Add/Edit forms unless specified specifically
       },
       updatedAt: {
         type: DataTypes.DATE,
-        field: 'updated_at'
+        field: 'updated_at',
+        isSystem:true
       }
     },
     {
@@ -338,7 +359,7 @@ module.exports = (sequelize, DataTypes) => {
 };
 ```
 
-Pretimuch thats it... let's setup Vue frontend now
+thats it... let's setup Vue frontend now
 
 ## Step 2: setup Vuetify app
 
@@ -379,11 +400,9 @@ First we need to update ```plugins/vuetify.js``` file as per given code
 
 ```javascript
 import Vue from 'vue';
-// import Vuetify from 'vuetify/lib/framework';
 import 'material-design-icons-iconfont/dist/material-design-icons.css'
 import 'vuetify/dist/vuetify.min.css'
 import Vuetify from "vuetify";
-// import { Ripple, Intersect, Touch, Resize } from "vuetify/lib/directives";
 
 Vue.use(Vuetify, {
     iconfont: 'md',
@@ -408,15 +427,13 @@ Also the default setup does not usage ```v-app``` from vuetify but just a div in
 </template>
 
 ```
-### Step2.2: setup services
+### Step2.2: setup services / axios connections
 
 
-To connect our service/server lets create a folder ```services``` in your project ```src``` folder. Considering server/service we created in express is for customers lets create afile ```customer.js``` in services folder and place the following code there
+To connect our service/server let's create a folder ```services``` in your project ```src``` folder. Considering server/service we created in express setup above, is for customers. Create a file ```customer.js``` in services folder and place the following code there
 
 ```js
 import axios from "axios";
-// import store from "../store";
-//import mock_api from "@/services/mock_customer";
 
 const api = axios.create({
   baseURL: process.env.VUE_APP_BASE_URL_CUSTOMER || "http://localhost:3000"
@@ -426,7 +443,7 @@ export default api;
 ```
 
 ### Step2.2: Create Vue Views
-Our system is ready to rock, now we will just create ```models```, ```methods``` and ```views/page```, The rest logic is well done by itself
+Our system is ready to rock, now we will just create ```models``` and ```methods``` in Sequlize at server side and ```views/page``` in Vue Frontend, The rest logic is well done by itself.
 
 for now open ```views/Home.vue``` file and place the following content to see the magic
 
@@ -467,10 +484,11 @@ By default system assumes ```name``` as title field that is shown instead of ID,
 
 This is how edit form and functionality is created.
 
-### REMEMBER, WE HAVE NOT CREATED OR TOUCHED ANYTHING ON SERVER SIDE AFTER CREATING MODELS AND JUST RUN IT.
 ![alt text](./assets/edit_action.png "Logo Title Text 1")
 
-Too much fields let's start configuring options, just change the crud options on vue component data as follows
+### REMEMBER, WE HAVE NOT CREATED OR TOUCHED ANYTHING ON SERVER SIDE AFTER CREATING MODELS AND JUST RUN SERVER.
+
+Too much fields, let's start configuring options, just change the crud options on vue component data as follows
 
 ```js
 data() {
@@ -479,8 +497,8 @@ data() {
         service: customer,
         model: "User",
         title: "Users",
-        //tableoptions defines all options for table
-        tableoptions: {
+        //retrive defines all options to define data retrive ie R IN CRUD
+        retrive: {
           // model options are for your sequlize models, all same (for Operators you need to do a small trick here)
           modeloptions: {
             attributes: ["name", "email", "state_id", "city_id", "status"],
@@ -499,29 +517,22 @@ And the configurations are easy to read and maintains. A complete configuration 
 
 WE ARE IN PROCESS TO HAVE A COMPLETE DOCUMENTATION AND TESTINGS. THIS IS JUST A WORKING PROTOTYPE. FUNCTIONAL BUT WILL BE REFACTORED FOR CODE QUALITY AND PERFORMANCE SOON.
 
-REMEMBER WE ARE STILL 0.0.1 ;)
+REMEMBER WE ARE STILL 0.0.x ;)
+
+# Detailed documentation of VNATK Components and respective options
+
+<details>
+<summary>&lt;vnatk-crud :options="crudoptions"&gt;</summary>
+
+</details>
 
 ```html
-
 <template>
-  <!-- <vnatk-crud :options="crudoptions2"> </vnatk-crud> -->
   <vnatk-crud :options="crudoptions">
-    <template v-slot:item.email="{ item }">
-      {{ "HELLOO" + " " + item.name }}<br />
-      {{ item.email }}
-    </template>
+  <!-- You can override any column and give it your own format -->
     <template v-slot:item.City.name="{ item }">
-      <div v-if="item.City">
-        {{ "HELLOO" + " " + item.City.name }}<br />
-        {{ item.City.status }}
-      </div>
-    </template>
-    <template v-slot:item.State.name="{ item }">
-      <div v-if="item.State">
-        {{ item.State.name }} <br />
-        {{ item.State.status }}
-      </div>
-      <div v-else>NO STATE SELECTED</div>
+      City: {{ item.City.name }}<br />
+      City Status : {{ item.City.status }}
     </template>
   </vnatk-crud>
 </template>
@@ -530,7 +541,7 @@ REMEMBER WE ARE STILL 0.0.1 ;)
 import { VnatkCrud } from "@/entry";
 import customer from "./services/customer";
 
-export default Vue.extend({
+export default {
   name: "ServeDev",
   components: {
     VnatkCrud,
@@ -538,15 +549,18 @@ export default Vue.extend({
   data() {
     return {
       crudoptions: {
-        // NEW OPTIONS
         service: customer,
-        basepath: "/crud", // vnatk service base path, default "/crud"
         model: "User",
         title: "Users",
-
-        tableoptions: {
-          title: "Users Management",
-          modeloptions: {
+        basepath: "/vnatk", //OPTIONAL, default to '/vnatk
+        create: { // OPTIONAL, default to true, set true to add all fields in Model
+          uititle: "Add New User",
+          modeloptions: { // Sequlize model options
+            attributes: ["name", "email", "status", "city_id", "password"],
+          },
+        },
+        retrive: { // OPTIONAL, default to true, set true to retrive all fields, headers and actions
+          modeloptions: { // Sequalize model options
             attributes: [
               "name",
               "email",
@@ -566,64 +580,19 @@ export default Vue.extend({
                 attributes: ["name", "status", "gst_code"],
               },
             ],
-            // order: [[{ model: "City" }, "name", "ASC"]],
-            // limit: 2,
           },
-          headers: true,
-          headersoverrides: {
-            city_id: {
-              hide: true,
-            },
-            state_id: {
-              hide: true,
-            },
-            mobile: {
-              text: "User Mobile",
-              sortable: true,
-              // value: "mobile",
-              // moveto: 0,
-            },
-            "City.name": {
-              // Override DeReferanced Fields (received from server due to autoderef)
-              text: "Primary City", //Overrided header caption/text
-              value: "City.name", // Value does not have effect as alrady overrided column by slot in template above
-              // moveto: 2,
-            },
-            "State.gst_code": {
-              text: "State GST Code",
-              value: "State.gst_code",
-              sortable: true,
-              moveto: 4,
-            },
-          },
+          modelscope: false, // String for scope name or Boolean true for default scope or false for unscoped
+          autoderef: true, // OPTIONAL, default true
+          headers: true, // OPTIONAL, default true
           serversidepagination: true, // Skip to fetch all records and do pagination and sorting on client side
-          datatableoptions: {
-            groupBY: [["status", "name"]],
-            groupDesc: [],
-            itemsPerPage: 5,
+          datatableoptions: { // OPTIONAL, defaults to v-datatable options.sync
             multiSort: true,
             mustSort: false,
-            // page: 1,
-            sortBy: [],
-            sortDesc: [],
           },
         },
-
-        allowadd: true,
-        addoptions: {
-          title: "Add New User",
-          modeloptions: {
-            attributes: ["name", "email", "status", "city_id", "password"],
-            include: {
-              model: "City",
-            },
-          },
-        },
-
-        allowedit: true,
-        editoptions: {
-          title: "Edit User - {name}",
-          modeloptions: {
+        update: { // OPTIONAL, defaults to true, set true to edit all non primary and system fields in crud
+          uititle: "Edit User - {name}",
+          modeloptions: { // Sequlize options to define what fields you want to allow to edit
             attributes: [
               "name",
               "email",
@@ -632,109 +601,116 @@ export default Vue.extend({
               "state_id",
               "mobile",
             ],
-            include: {
-              model: "City",
+          },
+        },
+        delete: true, // OPTIONAL, default ture, set false to remove delete action
+        actions: true, // OPTIONAL, default true, st false to hide all actions including add/edit and delete
+        ui: { // OPTIONAL, 
+          defaultActionPlacement: "DropDown", // "DropDown" or "buttonGroup". Where you want your default actions in row dropdown menu or as button in action columns for direct access
+        },
+        override: { //OPTIONAL
+          actions: [ // Override actions
+            {
+              name: "vnatk_edit", // edit action is given specially this name
+              placeIn: "buttonGroup", // or "DropDown"
+              // use this to merge formschema options
+              formschemaoverrides: { // Override formschema sent from server
+                mobile: {
+                  label: "Mobile Number",
+                },
+                city_id: {
+                  // titlefield - only used if field is reference/association type
+                  // default titlefield is considered as name
+                  titlefield: "City.name",
+                  label: "Your City",
+                  serviceoptions: { // OPTIONAL: Usefull if you are dealing with microservices
+                    service: customer,
+                    basepath: "/vnatk",
+                    model: "City",
+                    modelattributes: ["id", "name"],
+                    searchfield: ["name"],
+                    limit: 10,
+                  },
+                },
+                email: {
+                  clearable: true,
+                },
+                // state_id: {
+                //   titlefield: "State.name",
+                // no state_id related info is overrided, still working good, in this case: using same service to get details if id,name is required with default limit
+                // },
+              },
+            },
+            {
+              name: "vnatk_add", // add action is given specially this name
+              // use this to merge formschema options
+              formschemaoverrides: {
+                city_id: {
+                  label: "Your City ... ",
+                },
+              },
+            },
+            {
+              name: "activate",
+              placeIn: "buttonGroup", // or "DropDown"
+              icon: "mdi-format-align-left",
+              caption: "Activate User",
+              // formschema:{} // use this to override complete formschema
+              // formschemaoverrides:{} // use this to merge formschema options
+            },
+            {
+              name: "deactivate",
+              placeIn: "buttonGroup",
+              caption: "Deactivate",
+              // icon: "mdi-format-align-left",
+            },
+            {
+              name: "clientFunction",
+              type: "NoRecord",
+              execute: this.clientFunctionCallBack, // call this function if isClientAction to handle action, row items will be passed to function.
+              isClientAction: true,
+            },
+          ],
+          headers: { // OPTIONAL, override headers, hide, move position or create new columns
+            city_id: {
+              hide: true,
+            },
+            state_id: {
+              hide: true,
+            },
+            mobile: {
+              text: "User Mobile",
+              sortable: false, // OPTIONAL, default to true
+              // moveto: 0,
+            },
+            City: {
+              // Override DeReferanced Fields (received from server due to autoderef)
+              text: "Primary City", //Overrided header caption/text
+              value: "City.name", // Value does not have effect as alrady overrided column by slot in template above
+              // moveto: 2,
+            },
+            "State.gst_code": { // ADD a new column showing User.State.gst_code, look at how we included gst_code in retrive options model's include.
+              text: "State GST Code",
+              value: "State.gst_code",
+              sortable: true,
+              moveto: 4,
+            },
+            vnatk_actions: {
+              moveto: "last", // Either +INT to move from left to right or -INT to move from right to left or "last" to move column to last
             },
           },
         },
-
-        allowdelete: true,
-        fieldsmeta: true,
-        allowactions: true,
-        actionsoverrides: [
-          {
-            name: "vnatk_edit", // edit action is given specially this name
-            placeIn: "buttonGroup", // or "DropDown"
-            // use this to merge formschema options
-            formschemaoverrides: {
-              mobile: {
-                label: "Mobile Number",
-              },
-              city_id: {
-                // titlefield - only used if field is reference/association type
-                // default titlefield is considered as name
-                titlefield: "City.name",
-                label: "Your City",
-                serviceoptions: {
-                  service: customer,
-                  basepath: "/crud",
-                  model: "City",
-                  modelattributes: ["id", "name"],
-                  searchfield: ["name"],
-                  limit: 10,
-                },
-              },
-              email: {
-                clearable: true,
-              },
-              // state_id: {
-              //   titlefield: "State.name",
-              // no state_id related info is overrided, still working good, in this case: using same service to get details if id,name is required with default limit
-              // },
-            },
-          },
-          {
-            name: "vnatk_add", // add action is given specially this name
-            // use this to merge formschema options
-            formschemaoverrides: {
-              city_id: {
-                label: "Your City ... ",
-              },
-            },
-          },
-          {
-            name: "activate",
-            placeIn: "buttonGroup", // or "DropDown"
-            icon: "mdi-format-align-left",
-            caption: "Activate User",
-            // formschema:{} // use this to override complete formschema
-            // formschemaoverrides:{} // use this to merge formschema options
-          },
-          {
-            name: "deactivate",
-            placeIn: "buttonGroup",
-            caption: "Deactivate",
-            // icon: "mdi-format-align-left",
-          },
-          {
-            name: "clientFunction",
-            type: "NoRecord",
-            execute: this.clientFunctionCallBack,
-            isClientAction: true,
-          },
-        ],
-        defaultActionPlacement: "DropDown",
-      },
-      crudoptions2: {
-        service: customer,
-        model: "City",
-        autoderef: true, //default true, set false to avoid solving de-ref fields automatically, ie for city_id populate City.name field also
-        // tableoptions: {
-        //   modeloptions: {
-        //     include: ["State"],
-        //   },
-        //   headersoverrides: {
-        //     state_id: {
-        //       hide: true,
-        //     },
-        //     state: {
-        //       text: "Sates",
-        //       value: "State.name",
-        //       moveto: -1,
-        //     },
-        //   },
-        // },
       },
     };
   },
 
   methods: {
+    // Defined custom local clientaction handler
     clientFunctionCallBack(item) {
       console.log("CLIENT FUNCTION CALLED with item", item);
     },
   },
-});
+};
 </script>
-
 ```
 
