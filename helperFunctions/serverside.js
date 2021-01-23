@@ -48,7 +48,7 @@ module.exports = {
         for (let i = 0; i < fields.length; i++) {
             const fld = fields[i];
             const assosIndex = associations.findIndex(o => o.foreignKey == fields_info[fld].fieldName);
-            if (req.body.autoderef && assosIndex > -1) {
+            if (req.body.retrive && req.body.retrive.autoderef && assosIndex > -1) {
                 // ASSOCIATION found, belongsTo field
                 field_headers.push({
                     text: associations[assosIndex].name.singular,
@@ -68,7 +68,7 @@ module.exports = {
                     text: fields_info[fld].caption ? fields_info[fld].caption : fields_info[fld].fieldName,
                     value: fields_info[fld].fieldName,
                     sortable: fields_info[fld].sortable ? fields_info[fld].sortable : true,
-                    primaryKey: fields_info[fld].primaryKey ? true : undefined
+                    primaryKey: fields_info[fld].primaryKey ? true : undefined,
                 })
             }
         }
