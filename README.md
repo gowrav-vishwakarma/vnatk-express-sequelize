@@ -1,4 +1,4 @@
-# BETA : This line will be removed when production ready. DO NOT USE RIGHT NOW, OPTIONS MAY CHANGE (Last updated Jan 22, 2021)
+# BETA
 ---
 
 
