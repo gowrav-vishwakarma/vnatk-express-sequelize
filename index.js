@@ -39,19 +39,11 @@ module.exports = function (options) {
             if (req.body.actions) ModelHeaders = [...ModelHeaders, VNATKServerHelpers.injectActionColumn()];
         }
 
-        const { order, group } = VNATKServerHelpers.setupOrderByGroupBy(req.body.retrive.modeloptions, req.body.retrive.uioptions);
-        if (order) req.body.retrive.modeloptions.order = order
-
         var data;
         if (req.body.retrive.data !== false) {
             const senitizedmodeloptions = VNATKServerHelpers.senitizeModelOptions(req.body.retrive.modeloptions, model, Models);
             // Pginate data
             if (req.body.retrive.serversidepagination) {
-                const limit = req.body.retrive.uioptions.itemsPerPage ? req.body.retrive.uioptions.itemsPerPage : 25;
-                const offset = ((req.body.retrive.uioptions.page ? req.body.retrive.uioptions.page : 1) - 1) * limit;
-
-                req.body.retrive.modeloptions.limit = limit;
-                req.body.retrive.modeloptions.offset = offset;
 
                 data = await model.findAndCountAll(senitizedmodeloptions).catch(err => {
                     res.send(err);
