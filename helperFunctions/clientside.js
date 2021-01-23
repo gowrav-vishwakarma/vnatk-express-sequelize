@@ -36,6 +36,7 @@ module.exports = {
             case 'ENUM':
                 t['type'] = 'select';
                 t['items'] = field.type.values;
+                t['autocomplete'] = "disabled";
                 break
             case 'INTEGER':
                 t['type'] = 'number'
