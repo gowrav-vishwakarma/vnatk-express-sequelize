@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const VNATKServerHelpers = require('./helperFunctions/serverside');
+const modelDesigner = require('./modelDesigner');
 
 
 /**
@@ -120,12 +121,14 @@ module.exports = function (options) {
         res.send({ row_data: m_loaded });
     })
 
-    // router.post('/autocomplete', async function (req, res, next) {
-    //     const model = Models[req.body.model];
-    //     const senitizedmodeloptions = VNATKServerHelpers.senitizeModelOptions(req.body.tableoptions.modeloptions, model, Models);
-    //     const data = await model.findAll(senitizedmodeloptions);
-    //     res.send(data);
-    // })
+    router.get('/modeldesigner', function (req, res, next) {
+        modelDesigner.init(req, res, next, Models)
+    }
+    );
+    router.get('/modeldesigner/save', function (req, res, next) {
+        modelDesigner.save(req, res, next, Models)
+    }
+    );
 
     return router;
 };

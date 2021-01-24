@@ -22,7 +22,8 @@
         "README",
         "index.js",
         "helperFunctions/clientside.js",
-        "helperFunctions/serverside.js"
+        "helperFunctions/serverside.js",
+        "modelDesginer/index.js"
     ],
     "engines": {
         "node": ">=10"

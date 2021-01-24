@@ -62,9 +62,11 @@ module.exports = {
         Object.keys(model.associations).forEach((key) => {
             if (model.associations[key].hasOwnProperty('options')) {
                 delete model.associations[key].options.sequelize;
-                t.push(_.pick(model.associations[key].options, ['foreignKey', 'as', 'validate', 'indexes', 'name', 'onDelete', 'onUpdate']));
+                var opt = _.pick(model.associations[key].options, ['foreignKey', 'as', 'validate', 'indexes', 'name', 'onDelete', 'onUpdate']);
+                opt.associationType = model.associations[key].associationType;
+                t.push(opt);
             }
         });
         return t;
-    }
+    },
 }
