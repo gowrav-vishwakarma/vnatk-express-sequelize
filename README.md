@@ -189,7 +189,7 @@ app.use(cors()); // Use this after the variable declaration
 
 
 const Models = require('./models');
-app.use('/crud', vnatk({ // "/crud" will be your base path where the system will hit for its APIs
+app.use('/vnatk', vnatk({ // "/vnatk" will be your base path where the system will hit for its APIs
     Models: Models,
     router: express.Router()
 }));
