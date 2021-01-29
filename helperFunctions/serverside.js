@@ -80,7 +80,7 @@ module.exports = {
         const item = await model['create'](data).catch(error => {
             throw error;
         });
-        var m_loaded = await model.findByPk(item[model.primaryKeyAttributes[0]], readModelOptions);
+        var m_loaded = await model.unscoped().findByPk(item[model.primaryKeyAttributes[0]], readModelOptions);
         return m_loaded;
     },
 
@@ -92,7 +92,7 @@ module.exports = {
         const updated = await model.update(item, { where: where_condition }).catch(error => {
             throw error;
         });
-        var m_loaded = await model.findByPk(id, readModelOptions);
+        var m_loaded = await model.unscoped().findByPk(id, readModelOptions);
         return m_loaded;
     },
 
