@@ -73,9 +73,9 @@ module.exports = function (options) {
         const action = req.body.action_to_execute;
         const item = req.body.arg_item;
 
-        const model = Models[req.body.model];
+        var model = Models[req.body.model];
         if (req.body.retrive && req.body.retrive.modelscope !== undefined) {
-            if (req.body.retrive.modelscope == false) model.unscoped();
+            if (req.body.retrive.modelscope == false) model = model.unscoped();
             if (typeof req.body.retrive.modelscope === 'string') model.scope(req.body.retrive.modelscope);
         }
         const senitizedmodeloptions = VNATKServerHelpers.senitizeModelOptions(req.body.retrive.modeloptions, model, Models);

@@ -20,9 +20,9 @@ ACTIONSCODE
 ClassName.init(
 FIELDS,
     {
-        defaultScope,
+        _defaultScope_
         scopes,
-        tableName: '_tableName_',
+        tableName
         sequelize,
         modelName: 'ClassName',
     }

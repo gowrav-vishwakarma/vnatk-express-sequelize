@@ -82,7 +82,14 @@ module.exports = {
                 var fields_str = "";
                 fields_str += field.fieldName + ': {'
                 fields_str += 'type: DataTypes.' + field.type + ',';
-                fields_str += 'field: "' + field.dbField + '"'
+                if (field.dbField)
+                    fields_str += 'field: "' + field.dbField + '",'
+                if (field.defaultValue)
+                    fields_str += 'defaultValue: "' + field.defaultValue + '",'
+                if (field.caption)
+                    fields_str += 'caption: "' + field.caption + '",'
+                if (field.validate)
+                    fields_str += 'validate: ' + field.validate + ','
                 fields_str += '},'
                 fields_str_array.push(fields_str);
             }
@@ -95,15 +102,20 @@ module.exports = {
 
             for (let index = 0; index < modelData.scopesCrud.response.data.length; index++) {
                 const scope = modelData.scopesCrud.response.data[index];
-                if (scope.scope == 'defaultScope' && scope.code.length > 0) {
+                if (scope.scope == 'defaultScope' && scope.code && scope.code.length > 0) {
                     var ds = "defaultScope: ";
-                    file = file.replace(/defaultScope/gi, "\t" + ds + scope.code);
-                } else {
+                    file = file.replace(/_defaultScope_/gi, "\t" + ds + scope.code + ',');
+                } else if (scope.code) {
                     scopes_array.push(scope.scope + ':' + scope.code);
                 }
             }
+            file = file.replace(/_defaultScope_/gi, "");
+
             file = file.replace(/scopes/gi, "\tscopes:{" + scopes_array.join(",\n") + "}");
-            file = file.replace(/_tableName_/gi, modelData.tableName);
+            if (modelData.tableName)
+                file = file.replace(/tableName/gi, "tableName: '" + modelData.tableName + "',");
+            else
+                file = file.replace(/tableName/gi, "");
 
             await fs.writeFile(path.join(modelsPath, modelName + '.js'), file);
             // console.log(file);
