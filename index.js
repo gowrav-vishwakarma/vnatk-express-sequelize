@@ -34,7 +34,8 @@ module.exports = function (options) {
         if (req.body.create !== false) ModelActions = [...ModelActions, ...VNATKServerHelpers.injectAddAction(model, req)];
         if (req.body.update !== false) ModelActions = [...ModelActions, ...VNATKServerHelpers.injectEditAction(model, req)];
         if (req.body.delete !== false) ModelActions = [...ModelActions, ...VNATKServerHelpers.injectDeleteAction(model, req)];
-        if (req.body.actions) ModelActions = [...ModelActions, ...model.vnAtkGetActions()];
+        if (_.has(model, 'vnAtkGetActions'))
+            if (req.body.actions) ModelActions = [...ModelActions, ...model.vnAtkGetActions()];
         if (req.body.retrive && req.body.retrive.headers) {
             var ModelHeaders = VNATKServerHelpers.getHeadersAndDeRef(model, req);
             if (req.body.actions) ModelHeaders = [...ModelHeaders, VNATKServerHelpers.injectActionColumn()];

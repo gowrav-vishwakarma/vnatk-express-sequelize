@@ -1,7 +1,7 @@
 {
     "name": "vnatk-express-sequelize",
     "description": "VNATK-EXPRESS-SEQUELIZE is express middleware to provide automated backend for VNATK-VUE",
-    "version": "0.0.6",
+    "version": "0.0.9",
     "contributors": [
         "Gowrav Vishwakarma <gowravvishwakarma@gmail.com>"
     ],
@@ -23,7 +23,8 @@
         "index.js",
         "helperFunctions/clientside.js",
         "helperFunctions/serverside.js",
-        "modelDesginer/index.js"
+        "helperFunctions/modeldesigner.js",
+        "modelDesigner/index.js"
     ],
     "engines": {
         "node": ">=10"
