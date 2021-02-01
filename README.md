@@ -189,7 +189,7 @@ app.use(cors()); // Use this after the variable declaration
 
 
 const Models = require('./models');
-app.use('/crud', vnatk({ // "/crud" will be your base path where the system will hit for its APIs
+app.use('/vnatk', vnatk({ // "/vnatk" will be your base path where the system will hit for its APIs
     Models: Models,
     router: express.Router()
 }));
@@ -497,6 +497,9 @@ data() {
         service: customer,
         model: "User",
         title: "Users",
+        // Use response or retrive, response to work on Array based data crud and retrive for API based data fetch
+        // response: {idfield:'no', data:[{no:1,name:'x',age:20},{no:2,name:'y',age:20}],headers:[{text:'ID',value:'no',hide:true},{text,value},{}],actions:[{name,cation,type,formschema},{},{}]} // Provide data to skip service calling and managing Array dased data crud
+
         //retrive defines all options to define data retrive ie R IN CRUD
         retrive: {
           // model options are for your sequlize models, all same (for Operators you need to do a small trick here)
@@ -511,7 +514,7 @@ data() {
 
 and result is like 
 
-![alt text](./assets/example2.png "Logo Title Text 1")
+![alt text](./assets/example2.png "Eample 2 image")
 
 And the configurations are easy to read and maintains. A complete configuration can be as follows.
 
@@ -523,8 +526,6 @@ REMEMBER WE ARE STILL 0.0.x ;)
 
 <details>
 <summary>&lt;vnatk-crud :options="crudoptions"&gt;</summary>
-
-</details>
 
 ```html
 <template>
@@ -713,4 +714,39 @@ export default {
 };
 </script>
 ```
+</details>
 
+<details>
+<summary>&lt;model-designer :service="serviceInfo"&gt; </model-designer></summary>
+
+Model Designer is an under development tool to define and design your models from front end, Till beta model designer
+READS FROM `models` folder in express app BUT WRITES CHANGES IN copied files in `models/modeldesigner`.
+
+![alt text](./assets/model-designer.png "Model Designer")
+
+```html
+<template>
+  <model-designer :service="serviceInfo"> </model-designer>
+</template>
+
+<script>
+import { ModelDesigner } from "@/entry";
+import customer from "./services/customer";
+
+export default {
+  name: "ModelDesginierExample",
+  components: {
+    ModelDesigner,
+  },
+  data() {
+    return {
+      serviceInfo: {
+        service: customer,
+        basepath: "/vnatk",
+      },
+    };
+  },
+};
+</script>
+```
+</details>
