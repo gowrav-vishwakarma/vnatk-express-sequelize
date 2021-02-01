@@ -23,7 +23,7 @@
         "index.js",
         "helperFunctions/clientside.js",
         "helperFunctions/serverside.js",
-        "modelDesginer/index.js"
+        "modelDesigner/index.js"
     ],
     "engines": {
         "node": ">=10"
