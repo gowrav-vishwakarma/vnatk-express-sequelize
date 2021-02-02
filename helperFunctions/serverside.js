@@ -103,6 +103,7 @@ module.exports = {
             name: 'vnatk_add',
             caption: 'Add',
             type: 'NoRecord',
+
             formschema: VNATKClientHelpers.generateFormSchemaFromModel(model, addFields)
         }
         return [addAction];
@@ -115,6 +116,7 @@ module.exports = {
             name: 'vnatk_edit',
             caption: 'Edit',
             type: 'single',
+            placeIn: 'buttonGroup',
             formschema: VNATKClientHelpers.generateFormSchemaFromModel(model, editFields)
         }
         return [editAction];
@@ -125,6 +127,7 @@ module.exports = {
             name: 'vnatk_delete',
             caption: 'Delete',
             type: 'single',
+            placeIn: 'buttonGroup',
             formschema: {
                 confirm: {
                     type: "checkbox",

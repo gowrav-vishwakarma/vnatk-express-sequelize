@@ -26,6 +26,7 @@ module.exports = {
     },
 
     sequliseToFormSchemaType: function (field, ModelAssociations) {
+
         var t = { type: 'text' };
         switch (field.type.constructor.name) {
             case 'STRING':
@@ -38,12 +39,15 @@ module.exports = {
                 t['items'] = field.type.values;
                 t['autocomplete'] = "disabled";
                 break
+            case 'BOOLEAN':
+                t['type'] = 'checkbox';
+                break
             case 'INTEGER':
                 t['type'] = 'number'
                 if (_.has(field, 'references')) {
                     t.references = field.references;
                     t.association = ModelAssociations[_.findIndex(ModelAssociations, (as) => { return as.foreignKey == field.fieldName })];
-                    t.type = 'autocomplete';
+                    if (t.association) t.type = 'autocomplete';
                     t.searchInput = "";
                     t['no-filter'] = true;
                 }
