@@ -34,8 +34,11 @@ module.exports = function (options) {
         if (req.body.create !== false) ModelActions = [...ModelActions, ...VNATKServerHelpers.injectAddAction(model, req)];
         if (req.body.update !== false) ModelActions = [...ModelActions, ...VNATKServerHelpers.injectEditAction(model, req)];
         if (req.body.delete !== false) ModelActions = [...ModelActions, ...VNATKServerHelpers.injectDeleteAction(model, req)];
-        if (_.has(model, 'vnAtkGetActions'))
-            if (req.body.actions) ModelActions = [...ModelActions, ...model.vnAtkGetActions()];
+        if (_.has(model, 'vnAtkGetActions') || _.has(model.__proto__, 'vnAtkGetActions')) {
+            if (req.body.actions) {
+                ModelActions = [...ModelActions, ...model.vnAtkGetActions()];
+            }
+        }
         if (req.body.retrive && req.body.retrive.headers) {
             var ModelHeaders = VNATKServerHelpers.getHeadersAndDeRef(model, req);
             if (req.body.actions) ModelHeaders = [...ModelHeaders, VNATKServerHelpers.injectActionColumn()];
@@ -46,9 +49,10 @@ module.exports = function (options) {
             // Paginate data
             if (req.body.retrive.serversidepagination) {
 
-                data = await model.findAndCountAll(senitizedmodeloptions).catch(err => {
-                    res.send(err);
-                    res.end();
+                data = await model.findAndCountAll(senitizedmodeloptions).catch(error => {
+                    res.status(error.status || 500).send(error);
+                    return next(error);
+                    // res.end();
                 });
                 if (data) {
                     returnData['datacount'] = data.count;
@@ -58,7 +62,8 @@ module.exports = function (options) {
                 // return all data
                 data = await model.findAll(senitizedmodeloptions).catch(error => {
                     res.status(error.status || 500).send(error);
-                    res.end();
+                    return next(error);
+                    // res.end();
                 });
             }
             returnData['data'] = data;
