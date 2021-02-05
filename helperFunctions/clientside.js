@@ -10,10 +10,15 @@ module.exports = {
         if (fields == undefined) {
             fields = _.keys(rawAttributes);
         }
+
         var schema = {};
         for (let i = 0; i < fields.length; i++) {
             const element = fields[i];
-            const modelField = _.find(rawAttributes, (x) => x.fieldName == element);
+            var modelField = _.find(rawAttributes, (x) => x.fieldName == element);
+            if (element == model.autoIncrementAttribute) {
+                modelField = { fieldName: model.autoIncrementAttribute, type: { constructor: { name: 'idField' } } };
+            }
+
             schema[element] = Object.assign({
                 label: modelField.caption ? modelField.caption : modelField.fieldName
             },
@@ -43,6 +48,7 @@ module.exports = {
                 t['type'] = 'checkbox';
                 break
             case 'INTEGER':
+            case 'idField':
                 t['type'] = 'number'
                 if (_.has(field, 'references')) {
                     t.references = field.references;

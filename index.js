@@ -47,7 +47,6 @@ module.exports = function (options) {
         var data;
         if (req.body.retrive.data !== false) {
             const senitizedmodeloptions = VNATKServerHelpers.senitizeModelOptions(req.body.retrive.modeloptions, model, Models);
-
             // Paginate data
             if (req.body.retrive.serversidepagination) {
 
@@ -117,7 +116,7 @@ module.exports = function (options) {
             return;
         }
         else if (action.name == 'vnatk_delete') {
-            var m_loaded = await model.findByPk(item[model.primaryKeyAttributes[0]], senitizedmodeloptions).catch(error => {
+            var m_loaded = await model.findByPk(item[model.autoIncrementAttribute], senitizedmodeloptions).catch(error => {
                 res.status(VNATKServerHelpers.getErrorCode(error));
                 res.send(error);
                 res.end();
@@ -127,7 +126,7 @@ module.exports = function (options) {
             return;
         } else {
             // is it for : Single, multiple, none, all
-            var m_loaded = await model.unscoped().findByPk(item[model.primaryKeyAttributes[0]], senitizedmodeloptions);
+            var m_loaded = await model.unscoped().findByPk(item[model.autoIncrementAttribute], senitizedmodeloptions);
             if (action.formschema)
                 m_loaded[action.execute](req.body.formdata);
             else
