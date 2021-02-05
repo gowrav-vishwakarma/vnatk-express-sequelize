@@ -7,8 +7,15 @@ module.exports = {
         if (typeof (obj) === 'object') {
             for (const [key, value] of Object.entries(obj)) {
                 if (key == 'model') {
-                    // console.log(typeof models[value]);
+                    // handle scopes from text
                     obj.model = Models[value];
+                    if (_.has(obj, 'scope')) {
+                        if (obj.scope === false) {
+                            obj.model = obj.model.unscoped()
+                        } else {
+                            obj.model = obj.mode.scope(obj.scope)
+                        }
+                    }
                 }
                 else {
                     if (typeof (value) === 'object')
