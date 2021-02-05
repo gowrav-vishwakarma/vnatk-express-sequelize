@@ -52,7 +52,7 @@ module.exports = function (options) {
             if (req.body.retrive.serversidepagination) {
 
                 data = await model.findAndCountAll(senitizedmodeloptions).catch(error => {
-                    res.status(error.status || 500).send(error);
+                    res.status(error.status || 500);
                     return next(error);
                     // res.end();
                 });
@@ -63,7 +63,7 @@ module.exports = function (options) {
             } else {
                 // return all data
                 data = await model.findAll(senitizedmodeloptions).catch(error => {
-                    res.status(error.status || 500).send(error);
+                    res.status(error.status || 500);
                     return next(error);
                     // res.end();
                 });
