@@ -68,7 +68,8 @@ module.exports = {
                     text: model.autoIncrementAttribute,
                     value: model.autoIncrementAttribute,
                     sortable: true,
-                    isIdField: true
+                    isIdField: true,
+                    hide: true
                 })
                 continue;
             }
@@ -111,7 +112,6 @@ module.exports = {
 
     editRecord: async function (model, item, readModelOptions) {
         id = item[model.autoIncrementAttribute];
-        console.log('editing', item, ' with id ', id);
         delete item[model.autoIncrementAttribute];
         var where_condition = {};
         where_condition[model.autoIncrementAttribute] = id;

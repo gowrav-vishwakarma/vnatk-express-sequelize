@@ -48,7 +48,6 @@ module.exports = {
                 t['type'] = 'checkbox';
                 break
             case 'INTEGER':
-            case 'idField':
                 t['type'] = 'number'
                 if (_.has(field, 'references')) {
                     t.references = field.references;
@@ -58,6 +57,11 @@ module.exports = {
                     t['no-filter'] = true;
                 }
                 break;
+            case 'idField':
+                t['type'] = 'number'
+                t['isIdField'] = true
+                t['hide'] = true
+                break
             default:
                 t = { type: 'text' };
                 break;

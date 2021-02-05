@@ -97,7 +97,6 @@ module.exports = function (options) {
                 res.send({ row_data: cretedRecord, message: 'Record added successfully' });
                 return;
             }).catch(error => {
-                console.log(error);
                 res.status(VNATKServerHelpers.getErrorCode(error));
                 // res.send(error);
                 // res.end();
