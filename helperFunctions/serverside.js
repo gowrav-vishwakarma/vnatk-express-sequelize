@@ -103,10 +103,15 @@ module.exports = {
     },
 
     createNew: async function (model, data, readModelOptions) {
-        const item = await model['create'](data).catch(error => {
+        const item = await model.create(data).catch(error => {
             throw error;
         });
-        var m_loaded = await model.unscoped().findByPk(item[model.autoIncrementAttribute], readModelOptions);
+        id = item[model.autoIncrementAttribute];
+        var where_condition = {};
+        where_condition[model.autoIncrementAttribute] = id;
+        readModelOptions.where = where_condition;
+
+        var m_loaded = await model.unscoped().findOne(readModelOptions);
         return m_loaded;
     },
 

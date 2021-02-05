@@ -115,12 +115,17 @@ module.exports = function (options) {
             return;
         }
         else if (action.name == 'vnatk_delete') {
-            var m_loaded = await model.findByPk(item[model.autoIncrementAttribute], senitizedmodeloptions).catch(error => {
+            var id = item[model.autoIncrementAttribute];
+            var where_condition = {};
+            where_condition[model.autoIncrementAttribute] = id;
+            var m_loaded = await model.unscoped().findOne({ where: where_condition }).catch(error => {
                 res.status(VNATKServerHelpers.getErrorCode(error));
-                res.send(error);
-                res.end();
+                throw error;
             });
-            await m_loaded.destroy();
+            await m_loaded.destroy().catch(error => {
+                res.status(VNATKServerHelpers.getErrorCode(error));
+                throw error;
+            });
             res.send({ message: 'Record deleted' });
             return;
         } else {
