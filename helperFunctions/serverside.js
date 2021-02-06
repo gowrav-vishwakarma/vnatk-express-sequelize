@@ -31,8 +31,8 @@ module.exports = {
     },
 
     senitizeModelOptions(options, model, Models) {
-        if (_.has(options, 'attributes') && !options.attributes.includes(model.primaryKeyAttributes[0])) {
-            options.attributes.push(model.primaryKeyAttributes[0]);
+        if (_.has(options, 'attributes') && !options.attributes.includes(model.autoIncrementAttribute)) {
+            options.attributes.push(model.autoIncrementAttribute);
         }
         module.exports.replaceIncludeToObject(options, Models);
         return options;
@@ -45,15 +45,34 @@ module.exports = {
         var fields = undefined;
         if (req.body.retrive && req.body.retrive.modeloptions && req.body.retrive.modeloptions.attributes) fields = req.body.retrive.modeloptions.attributes;
 
+
         var fields_info = model.rawAttributes;
         if (!fields || fields == undefined || fields == null || fields == '' || fields == '*' || fields.length == 0) {
             fields = _.keys(fields_info);
         }
 
+        if (!fields.includes(model.autoIncrementAttribute)) {
+            fields.push(model.autoIncrementAttribute);
+        }
+
+        // No attribute defined, lets define idfield and all fields in attribute by our self here
+        if (req.body.retrive && req.body.retrive.modeloptions && !req.body.retrive.modeloptions.attributes)
+            req.body.retrive.modeloptions.attributes = fields;
+
         var field_headers = [];
 
         for (let i = 0; i < fields.length; i++) {
             const fld = fields[i];
+            if (fld == model.autoIncrementAttribute) {
+                field_headers.push({
+                    text: model.autoIncrementAttribute,
+                    value: model.autoIncrementAttribute,
+                    sortable: true,
+                    isIdField: true,
+                    hide: true
+                })
+                continue;
+            }
             const assosIndex = associations.findIndex(o => o.foreignKey == fields_info[fld].fieldName);
             if (req.body.retrive && req.body.retrive.autoderef && assosIndex > -1) {
                 // ASSOCIATION found, belongsTo field
@@ -84,22 +103,30 @@ module.exports = {
     },
 
     createNew: async function (model, data, readModelOptions) {
-        const item = await model['create'](data).catch(error => {
+        const item = await model.create(data).catch(error => {
             throw error;
         });
-        var m_loaded = await model.unscoped().findByPk(item[model.primaryKeyAttributes[0]], readModelOptions);
+
+
+        id = item[model.autoIncrementAttribute];
+        var where_condition = {};
+        where_condition[model.autoIncrementAttribute] = id;
+        readModelOptions.where = where_condition;
+
+        var m_loaded = await model.unscoped().findOne(readModelOptions);
         return m_loaded;
     },
 
     editRecord: async function (model, item, readModelOptions) {
-        id = item[model.primaryKeyAttributes[0]];
-        delete item[model.primaryKeyAttributes[0]];
+        id = item[model.autoIncrementAttribute];
+        delete item[model.autoIncrementAttribute];
         var where_condition = {};
-        where_condition[model.primaryKeyAttributes[0]] = id;
+        where_condition[model.autoIncrementAttribute] = id;
         const updated = await model.update(item, { where: where_condition }).catch(error => {
             throw error;
         });
-        var m_loaded = await model.unscoped().findByPk(id, readModelOptions);
+        readModelOptions.where = where_condition;
+        var m_loaded = await model.findOne(readModelOptions);
         return m_loaded;
     },
 

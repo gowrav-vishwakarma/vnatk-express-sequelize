@@ -10,10 +10,15 @@ module.exports = {
         if (fields == undefined) {
             fields = _.keys(rawAttributes);
         }
+
         var schema = {};
         for (let i = 0; i < fields.length; i++) {
             const element = fields[i];
-            const modelField = _.find(rawAttributes, (x) => x.fieldName == element);
+            var modelField = _.find(rawAttributes, (x) => x.fieldName == element);
+            if (element == model.autoIncrementAttribute) {
+                modelField = { fieldName: model.autoIncrementAttribute, type: { constructor: { name: 'idField' } } };
+            }
+
             schema[element] = Object.assign({
                 label: modelField.caption ? modelField.caption : modelField.fieldName
             },
@@ -52,6 +57,11 @@ module.exports = {
                     t['no-filter'] = true;
                 }
                 break;
+            case 'idField':
+                t['type'] = 'number'
+                t['isIdField'] = true
+                t['hide'] = true
+                break
             default:
                 t = { type: 'text' };
                 break;

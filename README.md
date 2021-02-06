@@ -315,6 +315,12 @@ module.exports = (sequelize, DataTypes) => {
 
   User.init(
     {
+      // WHILE SEQULIZE AUTOMATICALLY CONSIDER ID FIELD, FOR VNATK IT IS REQRUIED TO DEFINE AS FIELD
+      id:{
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+      },
       name: {
         type: DataTypes.STRING,
         // caption is vnatk field property to define its caption at frontend
@@ -575,6 +581,7 @@ export default {
               {
                 model: "City",
                 attributes: ["name", "status"],
+                scope: false // or text // As we can use Models as string here, scope can be set false or string here
               },
               {
                 model: "State",
