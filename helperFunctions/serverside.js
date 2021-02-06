@@ -106,6 +106,8 @@ module.exports = {
         const item = await model.create(data).catch(error => {
             throw error;
         });
+
+
         id = item[model.autoIncrementAttribute];
         var where_condition = {};
         where_condition[model.autoIncrementAttribute] = id;
@@ -124,7 +126,7 @@ module.exports = {
             throw error;
         });
         readModelOptions.where = where_condition;
-        var m_loaded = await model.unscoped().findOne(readModelOptions);
+        var m_loaded = await model.findOne(readModelOptions);
         return m_loaded;
     },
 

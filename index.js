@@ -49,7 +49,7 @@ module.exports = function (options) {
             const senitizedmodeloptions = VNATKServerHelpers.senitizeModelOptions(req.body.retrive.modeloptions, model, Models);
             // Paginate data
             if (req.body.retrive.serversidepagination) {
-
+                senitizedmodeloptions.distinct = true
                 data = await model.findAndCountAll(senitizedmodeloptions).catch(error => {
                     res.status(error.status || 500);
                     return next(error);
