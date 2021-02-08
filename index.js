@@ -32,6 +32,11 @@ module.exports = function (options) {
 
         var ModelActions = [];
         var returnData = {};
+        if (req.body.retrive && req.body.retrive.headers) {
+            var ModelHeaders = VNATKServerHelpers.getHeadersAndDeRef(model, req);
+            if (req.body.actions) ModelHeaders = [...ModelHeaders, VNATKServerHelpers.injectActionColumn()];
+        }
+
         if (req.body.create !== false) ModelActions = [...ModelActions, ...VNATKServerHelpers.injectAddAction(model, req)];
         if (req.body.update !== false) ModelActions = [...ModelActions, ...VNATKServerHelpers.injectEditAction(model, req)];
         if (req.body.delete !== false) ModelActions = [...ModelActions, ...VNATKServerHelpers.injectDeleteAction(model, req)];
@@ -40,10 +45,7 @@ module.exports = function (options) {
                 ModelActions = [...ModelActions, ...model.vnAtkGetActions()];
             }
         }
-        if (req.body.retrive && req.body.retrive.headers) {
-            var ModelHeaders = VNATKServerHelpers.getHeadersAndDeRef(model, req);
-            if (req.body.actions) ModelHeaders = [...ModelHeaders, VNATKServerHelpers.injectActionColumn()];
-        }
+
         var data;
         if (req.body.retrive.data !== false) {
             const senitizedmodeloptions = VNATKServerHelpers.senitizeModelOptions(req.body.retrive.modeloptions, model, Models);
@@ -90,7 +92,10 @@ module.exports = function (options) {
             VNATKServerHelpers.getHeadersAndDeRef(model, req);
         }
 
-        const senitizedmodeloptions = VNATKServerHelpers.senitizeModelOptions(req.body.retrive.modeloptions, model, Models);
+        var senitizedmodeloptions;
+        if (req.body.retrive) {
+            senitizedmodeloptions = VNATKServerHelpers.senitizeModelOptions(req.body.retrive.modeloptions, model, Models);
+        }
 
         if (action.name == 'vnatk_add') {
             VNATKServerHelpers.createNew(model, item, senitizedmodeloptions).then((cretedRecord) => {
@@ -130,13 +135,17 @@ module.exports = function (options) {
             return;
         } else {
             // is it for : Single, multiple, none, all
-            var m_loaded = await model.unscoped().findByPk(item[model.autoIncrementAttribute], senitizedmodeloptions);
-            if (action.formschema)
-                m_loaded[action.execute](req.body.formdata);
+            var m_loaded = await model.unscoped();
+
+            if (item && item[model.autoIncrementAttribute])
+                var m_loaded = await m_loaded.findByPk(item[model.autoIncrementAttribute], senitizedmodeloptions);
+
+            if (req.body.formdata)
+                var response = m_loaded[action.execute](req.body.formdata);
             else
                 m_loaded[action.execute]();
 
-            res.send({ row_data: m_loaded });
+            res.send({ row_data: response ? response : m_loaded });
         }
     })
 

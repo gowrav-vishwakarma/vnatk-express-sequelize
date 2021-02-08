@@ -4,58 +4,25 @@
 
 ## VNATK
 
-VNATK is a set of client and server frameworks set to get your work started ASAP. Also we all know how tesdius it is to do maintenance of any project specially when client/company is ever changing their requirements. By looking at those issue I was missing somehting that really is fast, really RAPID APPLICATION DEVELOPMENT (RAD) framework.
+VNATK is a set of client and server frameworks set to get your work started ASAP, Trying to be most Rapid system with total customization in hand.
 
-So, here we are with two sets of frameworks, this VNATK-VUE and VNATK-EXPRESS-SEQULIZE.
+VNATK is developed to keep the following few points in mind
+- Most of the time we spend time in creating trivial APIs, that actually servers identical with different models.
+- we all know how tesdius it is to do maintenance of any project specially when client/company is ever changing their requirements. By looking at those issue I was missing somehting that really is fast, really RAPID APPLICATION DEVELOPMENT (RAD) framework.
 
-Both repository contains same README file so pls follow proper link to go to respective repository.
+VNATK-EXPRESS-SEQULIZE is implementation of Sequlize-QL (Given name as per Graph-QL) that can be used as independent tool to ease your API development.
 
-Link to [VUEATK-VUE] (https://github.com/gowrav-vishwakarma/vnatk-vue) 
-
-Link to [VUEATK-EXPRESS-SEQUELIZE] (https://github.com/gowrav-vishwakarma/vnatk-express-sequelize) 
+The main purpose though to develop VNATK-EXPRESS-SEQULIZE is to provide API-Less server system for VNATK framework. It works in combination with its counter front part like VUEATK-VUE [https://github.com/gowrav-vishwakarma/vnatk-vue]
 
 # VNATK-EXPRESS-SEQULIZE (Backend with Express and Squelize)
 ---
 
-equipped with a few endpoints that gives you all power with SequalizedSQL (pronounced `sec-QL`) developed by this project.
+equipped with a few endpoints that gives you all power with Sequalized-QL developed and defined by this project only.
 
-This express middleware will give all the fule required from server to VNATK Frontend Frameworks. 
+This express middleware will give all the fule required from server to VNATK Frontend Frameworks. And this can also be used as independent API easer.
 
 
 Dependencies: body-parser, debug, dotenv,lodash, mysql2, sequelize
-
-
-# VNATK-VUE (FrontEnd with Vue, Vuetify)
----
-
-VNATKVUE is Frontend part of VNATK (Vue Node AgileTool Kit). Making app development easy by including some best practices as integral part, yet, giving you total customization options.
-
-
-Dependencies: Vue (2.\*), Vuetify(2.\*), vue-form-base, lodash, dotenv
-
-
-
-## Getting started
-
-For simplicity we have our project folder structure as follows
-
-```bash
-Your Project Root Folder
- - client # Having vue fronetend
- - server # Having express-sequelize backend
-```
-In case you are working with microservice architecture, you can have following structure
-
-```bash
-Your Project Root Folder
- - VueClientAPP1
- - VueClientAPP2
- - ExpressBackendService1
- - ExpressBackendService2
- - ...
- - ExpressBackendService..N
-```
-
 # Step 1.0: setup express app
 Considering we are in "Your Project Root Folder"
 
@@ -168,9 +135,9 @@ const model = sequelize['import'](path.join(__dirname, file));
     const model = require(path.join(__dirname, file))(sequelize, Sequelize.DataTypes)
 ```
 
-## Step 1.2: configure and use vnatk-express-sequelize
+## Step 2.0: configure and use vnatk-express-sequelize
 
-Please add the following code in your `app.js` file. (DON'T COPY PASTE WHOLE FILE) 
+Please add the following code in your `app.js` file. (DON'T COPY PASTE WHOLE CODE, ITS NOT FULL FILE CODE) 
 
 ```javascript
 // somewhere on the top after 
@@ -194,7 +161,7 @@ app.use('/vnatk', vnatk({ // "/vnatk" will be your base path where the system wi
     router: express.Router()
 }));
 ```
-### Step 1.3: setup Models
+### Step 2.1: setup Models
 
 Create models in ```models``` folder. For more about Models in sequlize please follow sequlize documentations.
 
@@ -214,7 +181,7 @@ module.exports = (sequelize, DataTypes) => {
       User.belongsTo(models.State, { foreignKey: 'state_id' });
 
     }
-    // you have to create this STATIC function in your model to tell what type of actions are doable on any model
+    // you have to create this STATIC function in your model to tell what type of actions are doable on any model (NOT NEEDED IF YOU ARE NOT USING VNATK-VUE)
     static vnAtkGetActions(models) {
       return [
         {
@@ -315,12 +282,6 @@ module.exports = (sequelize, DataTypes) => {
 
   User.init(
     {
-      // WHILE SEQULIZE AUTOMATICALLY CONSIDER ID FIELD, FOR VNATK IT IS REQRUIED TO DEFINE AS FIELD
-      id:{
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
-      },
       name: {
         type: DataTypes.STRING,
         // caption is vnatk field property to define its caption at frontend

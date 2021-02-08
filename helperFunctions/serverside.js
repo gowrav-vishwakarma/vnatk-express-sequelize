@@ -59,6 +59,11 @@ module.exports = {
         if (req.body.retrive && req.body.retrive.modeloptions && !req.body.retrive.modeloptions.attributes)
             req.body.retrive.modeloptions.attributes = fields;
 
+        if (req.body.retrive && req.body.retrive.modeloptions && req.body.retrive.modeloptions.attributes && !req.body.retrive.modeloptions.attributes.includes(model.autoIncrementAttribute)) {
+            req.body.retrive.modeloptions.attributes.push(model.autoIncrementAttribute);
+        }
+
+
         var field_headers = [];
 
         for (let i = 0; i < fields.length; i++) {
