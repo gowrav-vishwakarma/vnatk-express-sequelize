@@ -24,6 +24,13 @@ module.exports = function (options) {
     router.post('/crud', async function (req, res, next) {
         var model = Models[req.body.model];
 
+        if (!model) {
+            res.status(500).send({ error: true, Message: 'Model ' + req.body.model + ' not found' });
+            return;
+        }
+
+        if (!req.body.retrive) req.body.retrive = {};
+
         if (req.body.retrive && req.body.retrive.modelscope !== undefined) {
             if (req.body.retrive.modelscope == false) model = model.unscoped();
             if (typeof req.body.retrive.modelscope === 'string') model.scope(req.body.retrive.modelscope);
