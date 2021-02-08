@@ -1,8 +1,9 @@
-# BETA
+## ALPHA/BETA - Under heavy development and not for production use
 ---
 
+Master-branch: ![Vnatk-tests](https://github.com/gowrav-vishwakarma/vnatk-express-sequelize/workflows/Vnatk-tests/badge.svg?branch=master) Develop-branch: ![Vnatk-tests](https://github.com/gowrav-vishwakarma/vnatk-express-sequelize/workflows/Vnatk-tests/badge.svg?branch=develop)
 
-## VNATK
+# VNATK
 
 VNATK is a set of client and server frameworks set to get your work started ASAP, Trying to be most Rapid system with total customization in hand.
 
