@@ -43,7 +43,7 @@ module.exports = {
     getHeadersAndDeRef: function (model, req) {
         const associations = VNATKClientHelpers.getAssociations(model);
         var fields = undefined;
-        if (req.body.retrive && req.body.retrive.modeloptions && req.body.retrive.modeloptions.attributes) fields = req.body.retrive.modeloptions.attributes;
+        if (req.body.read && req.body.read.modeloptions && req.body.read.modeloptions.attributes) fields = req.body.read.modeloptions.attributes;
 
 
         var fields_info = model.rawAttributes;
@@ -56,11 +56,11 @@ module.exports = {
         }
 
         // No attribute defined, lets define idfield and all fields in attribute by our self here
-        if (req.body.retrive && req.body.retrive.modeloptions && !req.body.retrive.modeloptions.attributes)
-            req.body.retrive.modeloptions.attributes = fields;
+        if (req.body.read && req.body.read.modeloptions && !req.body.read.modeloptions.attributes)
+            req.body.read.modeloptions.attributes = fields;
 
-        if (req.body.retrive && req.body.retrive.modeloptions && req.body.retrive.modeloptions.attributes && !req.body.retrive.modeloptions.attributes.includes(model.autoIncrementAttribute)) {
-            req.body.retrive.modeloptions.attributes.push(model.autoIncrementAttribute);
+        if (req.body.read && req.body.read.modeloptions && req.body.read.modeloptions.attributes && !req.body.read.modeloptions.attributes.includes(model.autoIncrementAttribute)) {
+            req.body.read.modeloptions.attributes.push(model.autoIncrementAttribute);
         }
 
 
@@ -79,7 +79,7 @@ module.exports = {
                 continue;
             }
             const assosIndex = associations.findIndex(o => o.foreignKey == fields_info[fld].fieldName);
-            if (req.body.retrive && req.body.retrive.autoderef && assosIndex > -1) {
+            if (req.body.read && req.body.read.autoderef && assosIndex > -1) {
                 // ASSOCIATION found, belongsTo field
                 field_headers.push({
                     text: associations[assosIndex].name.singular,
@@ -87,11 +87,11 @@ module.exports = {
                     sortable: fields_info[fld].sortable ? fields_info[fld].sortable : true,
                 })
                 // TODO add in model include if not set
-                if (!req.body.retrive.modeloptions.include) req.body.retrive.modeloptions.include = [];
-                inArrayAsString = req.body.retrive.modeloptions.include.includes(associations[assosIndex].name.singular);
-                inArrayAsObjectInclude = req.body.retrive.modeloptions.include.findIndex(o => o.model == associations[assosIndex].name.singular);
+                if (!req.body.read.modeloptions.include) req.body.read.modeloptions.include = [];
+                inArrayAsString = req.body.read.modeloptions.include.includes(associations[assosIndex].name.singular);
+                inArrayAsObjectInclude = req.body.read.modeloptions.include.findIndex(o => o.model == associations[assosIndex].name.singular);
                 if (!inArrayAsString && inArrayAsObjectInclude == -1) {
-                    req.body.retrive.modeloptions.include.push(associations[assosIndex].name.singular);
+                    req.body.read.modeloptions.include.push(associations[assosIndex].name.singular);
                 }
 
             } else {

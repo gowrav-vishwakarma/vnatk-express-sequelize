@@ -29,17 +29,17 @@ module.exports = function (options) {
             return;
         }
 
-        if (!req.body.retrive) req.body.retrive = {};
+        if (!req.body.read) req.body.read = {};
 
-        if (req.body.retrive && req.body.retrive.modelscope !== undefined) {
-            if (req.body.retrive.modelscope == false) model = model.unscoped();
-            if (typeof req.body.retrive.modelscope === 'string') model.scope(req.body.retrive.modelscope);
+        if (req.body.read && req.body.read.modelscope !== undefined) {
+            if (req.body.read.modelscope == false) model = model.unscoped();
+            if (typeof req.body.read.modelscope === 'string') model.scope(req.body.read.modelscope);
         }
 
 
         var ModelActions = [];
         var returnData = {};
-        if (req.body.retrive && req.body.retrive.headers) {
+        if (req.body.read && req.body.read.headers) {
             var ModelHeaders = VNATKServerHelpers.getHeadersAndDeRef(model, req);
             if (req.body.actions) ModelHeaders = [...ModelHeaders, VNATKServerHelpers.injectActionColumn()];
         }
@@ -54,10 +54,10 @@ module.exports = function (options) {
         }
 
         var data;
-        if (req.body.retrive.data !== false) {
-            const senitizedmodeloptions = VNATKServerHelpers.senitizeModelOptions(req.body.retrive.modeloptions, model, Models);
+        if (req.body.read.data !== false) {
+            const senitizedmodeloptions = VNATKServerHelpers.senitizeModelOptions(req.body.read.modeloptions, model, Models);
             // Paginate data
-            if (req.body.retrive.serversidepagination) {
+            if (req.body.read.serversidepagination) {
                 senitizedmodeloptions.distinct = true
                 data = await model.findAndCountAll(senitizedmodeloptions).catch(error => {
                     res.status(error.status || 500);
@@ -79,7 +79,7 @@ module.exports = function (options) {
             returnData['data'] = data;
         }
 
-        if (req.body.retrive && req.body.retrive.headers) returnData['headers'] = ModelHeaders;
+        if (req.body.read && req.body.read.headers) returnData['headers'] = ModelHeaders;
         if (req.body.actions) returnData['actions'] = ModelActions;
 
         res.send(returnData);
@@ -90,18 +90,18 @@ module.exports = function (options) {
         const item = req.body.arg_item;
 
         var model = Models[req.body.model];
-        if (req.body.retrive && req.body.retrive.modelscope !== undefined) {
-            if (req.body.retrive.modelscope == false) model = model.unscoped();
-            if (typeof req.body.retrive.modelscope === 'string') model.scope(req.body.retrive.modelscope);
+        if (req.body.read && req.body.read.modelscope !== undefined) {
+            if (req.body.read.modelscope == false) model = model.unscoped();
+            if (typeof req.body.read.modelscope === 'string') model.scope(req.body.read.modelscope);
         }
 
-        if (req.body.retrive && req.body.retrive.headers) {
+        if (req.body.read && req.body.read.headers) {
             VNATKServerHelpers.getHeadersAndDeRef(model, req);
         }
 
         var senitizedmodeloptions;
-        if (req.body.retrive) {
-            senitizedmodeloptions = VNATKServerHelpers.senitizeModelOptions(req.body.retrive.modeloptions, model, Models);
+        if (req.body.read) {
+            senitizedmodeloptions = VNATKServerHelpers.senitizeModelOptions(req.body.read.modeloptions, model, Models);
         }
 
         if (action.name == 'vnatk_add') {

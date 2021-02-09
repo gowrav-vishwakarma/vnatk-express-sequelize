@@ -8,7 +8,7 @@ before(async () => {
     await sequelize.sync();
 });
 
-describe('loading express', function () {
+describe('Minimum setup testing', function () {
     var server;
     server = require('../testapp', { bustCache: true });
     // beforeEach(function () {
@@ -27,17 +27,20 @@ describe('loading express', function () {
             .post('/vnatk/crud')
             .send({ model: '_User' })
             .expect(500)
-            .then(response => {
-                assert(response.body.error, true)
-                assert.equal(response.body.Message, 'Model _User not found')
+            .then(res => {
+                assert(res.body.error, true)
+                assert.equal(res.body.Message, 'Model _User not found')
                 done();
             })
             .catch(err => done(err))
     });
+
     it('404 everything else', function testPath(done) {
         request(server)
             .get('/foo/bar')
             .expect(404, done);
     });
+
+
     server.close()
 });
