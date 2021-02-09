@@ -18,7 +18,7 @@ The main purpose though to develop VNATK-EXPRESS-SEQULIZE is to provide API-Less
 # VNATK-EXPRESS-SEQULIZE (Backend with Express and Squelize)
 ---
 
-equipped with a few endpoints that gives you all power with Sequalized-QL developed and defined by this project only.
+Equipped with a few endpoints that gives you all power with Sequalized-QL developed and defined by this project only.
 
 This express middleware will give all the fule required from server to VNATK Frontend Frameworks. And this can also be used as independent API provider (inspired from Graph-QL).
 
@@ -77,7 +77,7 @@ module.exports = {
         "database": process.env.DB_DATABASE || "your_awasome_db_name",
         "host": process.env.DB_HOST || "127.0.0.1",
         "dialect": "mysql",
-        operatorsAliases: { $lt: Op.lt, $gt: Op.gt, $like: Op.like },
+        operatorsAliases: { $lt: Op.lt, $gt: Op.gt, $like: Op.like }, // Feel free to add all other operators as per needed.
         "dialectOptions": {
             "dateStrings": true,
             "typeCast": true
@@ -118,7 +118,7 @@ module.exports = {
 since we changed json file to js, sequlize's default ```model/index.js``` file needs a change too, open this file and change 
 
 ```js
-# some where at top replace config const declaration with the below line, look at 'json' removed
+# some where at top replace config const declaration with the below line, look at 'json' file extension removed
 
 const config = require(__dirname + '/../config/config')[env];
 
@@ -283,10 +283,63 @@ This API is used to read data, DON'T GET CONFUSED with CRUD Name, this API DO NO
 - {base_path}/executeaction (POST)
 This API is responsible for various actions includeing Create, Update, Delete and Other Methods on Models.
 
-`{base_path}/crud` options
+`{base_path}/crud` options 
 ---
 
-| Option      | Type        | Description 
-| ----------- | ----------- | --------
-| model       | String      | Model name to work on, Mendatory
-| model.read   | JSON        | options to read operations
+### Options for API only
+
+| Option      | Type        | Default | Description 
+| ----------- | ----------- | --------| ----
+| model       | `String`      | `null`  | Model name to work on, [Mendatory]
+| read   | `JSON`        | {} | options for read operations, [Optional]
+| read.modeloptions   | `JSON` |         | Options to pass to your model define above
+| read.modelscope   | `String`\|`false` |       | `false` to use unscoped model and avoid any default scope applied on model, or use define scope to use as string
+| read.autoderef   | `Boolean`       | `true` | Try to solve belongsTo relation and get name/title of related field ie cityId to City.name (Auto includes)
+| read.headers   | `Boolean`       | `true` | Sends headers infor about fields included for UI processing, Mainly used by VNATK-VUE, you can set to `false` is only using APIs.
+| actions   | `Boolean`       | `true` | Sends Actions applicable including Create, Update and Delete and their formschema, set to `false` if using in API only mode.
+
+
+There are more rich set of options applicable when using with VNATK-VUE. To know more about those options pls follow VUEATK-VUE [https://github.com/gowrav-vishwakarma/vnatk-vue]
+
+
+`{base_path}/executeaction` options 
+---
+
+| Option      | Type        | Default | Description 
+| ----------- | ----------- | --------| ----
+| model       | `String`      | `null`  | Model name to work on, [Mendatory]
+| read   | `JSON`        | {} | options for read operations, [Optional]
+| read.modeloptions   | `JSON` |         | Options to pass to your model define above
+| read.modelscope   | `String`\|`false` |       | `false` to use unscoped model and avoid any default scope applied on model, or use define scope to use as string
+| action_to_execute| `String` | `null` | Action to perform on defined model <br/> supported default actions are  <br/> - `vnatk_add`: pass arg_item data to create a new record of given model. <br/> - `vnatk_edit`: pass arg_item data to edit model record, arg_item must have primary/autoincrement value availabe, model will be loaded by that value and all other values passed will be updated on model. <br/> - `vnatk_delete`: pass arg_item data to delete model record, arg_item must have primary/autoincrement value availabe, model will be loaded by that value and then destroys. <br/> - `{Any User Defined Method Name}`: pass arg_item data to your method defined in Model class/declatation. <p>Actions retuns data of added/edited/deleted item, but in any case modeloptions contains some condition that is changed due to editing, `null` is returned instead</p>
+
+
+#### Changes in read.modeloptions from standard Sequlize model options
+
+```JSON
+{
+  model:'User',
+  read:{
+    modeloptions:{
+      attributes:['name','age'],
+      include:[
+        {
+          model:'City', 
+          as:'MyCity',
+          scope:false // <== or String to modify City model with unscoped or scope defined by this string
+        }
+      ],
+      where:{
+        age:{
+          $lt: 18 // <== operator aliases defined in config.js file
+        }
+      }
+    },
+    modelscope:false // <== false for unscoped User or String for scope name for User model
+  }
+}
+```
+
+Under development:
+
+Authorization and ACL based on each Model or record is under development
