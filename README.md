@@ -59,70 +59,6 @@ $yourProjectRoot/server> npm install --save-dev sequelize-cli
 $yourProjectRoot/server> sequelize init
 
 ```
-## Step 1.1: express app configurations
-
-sequlize init creates ```config/config.json``` file but we need env access to config also rename ```config/config.json``` to ```config/config.js```
-
-and REPLACE the follwoing content in `config/config.js` file (Complete content copy paste)
-
-```js
-require('dotenv').config();
-const sequelize = require('sequelize')
-const Op = sequelize.Op
-
-module.exports = {
-    "development": {
-        "username": process.env.DB_USER_NAME || "root",
-        "password": process.env.DB_PASSWORD || null",
-        "database": process.env.DB_DATABASE || "your_awasome_db_name",
-        "host": process.env.DB_HOST || "127.0.0.1",
-        "dialect": "mysql",
-        operatorsAliases: { $lt: Op.lt, $gt: Op.gt, $like: Op.like }, // Feel free to add all other operators as per needed.
-        "dialectOptions": {
-            "dateStrings": true,
-            "typeCast": true
-        },
-        "timezone": '+05:30'
-    },
-    "test": {
-        "username": "root",
-        "password": null,
-        "database": "database_test",
-        "host": "127.0.0.1",
-        "dialect": "mysql",
-        "operatorsAliases": false,
-        "dialectOptions": {
-            "useUTC": false, //for reading from database
-            "dateStrings": true,
-            "typeCast": true
-        },
-        "timezone": '+05:30'
-    },
-    "production": {
-        "username": process.env.DB_USER_NAME || "root",
-        "password": process.env.DB_PASSWORD || null,
-        "database": process.env.DB_DATABASE || null,
-        "host": process.env.DB_HOST || "127.0.0.1",
-        "port": process.env.DB_PORT || "3306",
-        "dialect": "mysql",
-        "operatorsAliases": false,
-        "dialectOptions": {
-            "useUTC": false, //for reading from database
-            "dateStrings": true,
-            "typeCast": true
-        },
-        "timezone": '+05:30'
-    }
-}
-```
-since we changed json file to js, sequlize's default ```model/index.js``` file needs a change too, open this file and change 
-
-```js
-# some where at top replace config const declaration with the below line, look at 'json' file extension removed
-
-const config = require(__dirname + '/../config/config')[env];
-
-```
 
 sometimes sequelize have issues in reading models from file like this specially if your sequlize cli is old and you are  using seulize v6, in case of that, you may get sequelize import method error.
 
@@ -308,7 +244,7 @@ There are more rich set of options applicable when using with VNATK-VUE. To know
 | Option      | Type        | Default | Description 
 | ----------- | ----------- | --------| ----
 | model       | `String`      | `null`  | Model name to work on, [Mendatory]
-| read   | `JSON`        | {} | options for read operations, [Optional]
+| read   | `JSON`        | {} | options for model to be used to apply action on, [Optional]
 | read.modeloptions   | `JSON` |         | Options to pass to your model define above
 | read.modelscope   | `String`\|`false` |       | `false` to use unscoped model and avoid any default scope applied on model, or use define scope to use as string
 | action_to_execute| `String` | `null` | Action to perform on defined model <br/> supported default actions are  <br/> - `vnatk_add`: pass arg_item data to create a new record of given model. <br/> - `vnatk_edit`: pass arg_item data to edit model record, arg_item must have primary/autoincrement value availabe, model will be loaded by that value and all other values passed will be updated on model. <br/> - `vnatk_delete`: pass arg_item data to delete model record, arg_item must have primary/autoincrement value availabe, model will be loaded by that value and then destroys. <br/> - `{Any User Defined Method Name}`: pass arg_item data to your method defined in Model class/declatation. <p>Actions retuns data of added/edited/deleted item, but in any case modeloptions contains some condition that is changed due to editing, `null` is returned instead</p>
