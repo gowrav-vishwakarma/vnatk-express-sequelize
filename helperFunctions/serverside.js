@@ -106,7 +106,7 @@ module.exports = {
             case '$and':
                 delete object[k];
                 return object[Op.and] = v;
-            case '$or ':
+            case '$or':
                 delete object[k];
                 return object[Op.or] = v;
             case '$any':
@@ -148,8 +148,9 @@ module.exports = {
                     module.exports.replaceOperators(obj, key, value);
                 }
 
-                if (typeof (value) === 'object')
+                if (typeof (value) === 'object') {
                     module.exports.replaceIncludeToObject(value, Models);
+                }
             }
         } else if (Array.isArray(obj)) {
             for (let index = 0; index < obj.length; index++) {
@@ -164,7 +165,6 @@ module.exports = {
             options.attributes.push(model.autoIncrementAttribute);
         }
         module.exports.replaceIncludeToObject(options, Models);
-        module.exports.replaceOperators(options);
         return options;
     },
 
