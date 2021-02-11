@@ -140,6 +140,7 @@ module.exports = function (options) {
             });
             res.send({ message: 'Record deleted' });
             return;
+        } else if (action.name == 'vnatk_autobulkimport') {
         } else {
             // is it for : Single, multiple, none, all
             var m_loaded = await model.unscoped();

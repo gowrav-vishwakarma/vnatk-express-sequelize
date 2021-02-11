@@ -1,7 +1,146 @@
 const VNATKClientHelpers = require("../helperFunctions/clientside");
 const _ = require('lodash');
+const sequelize = require('sequelize')
+const Op = sequelize.Op
+
+const operators = { $eq: '', $ne: '', $gte: '', $gt: '', $lte: '', $lt: '', $not: '', $is: '', $in: '', $notIn: '', $like: '', $notLike: '', $viLike: '', $notILike: '', $startsWith: '', $endsWith: '', $substring: '', $regexp: '', $notRegexp: '', $iRegexp: '', $notIRegexp: '', $between: '', $notBetween: '', $overlap: '', $contains: '', $contained: '', $adjacent: '', $strictLeft: '', $strictRight: '', $noExtendRight: '', $noExtendLeft: '', $and: '', $or: '', $any: '', $all: '', $values: '', $col: '', $placeholder: '', $join: '' };
 
 module.exports = {
+
+    replaceOperators(object) {
+        return Array.isArray(object)
+            ? object.map(module.exports.replaceOperators)
+            : object && typeof object === 'object'
+                ? Object.fromEntries(Object
+                    .entries(object)
+                    .map(([k, v]) => {
+                        if (k in operators) {
+                            switch (k) {
+                                case '$eq':
+                                    delete object[k];
+                                    return [object[Op.eq] = v];
+                                case '$ne':
+                                    delete object[k];
+                                    return [object[Op.ne] = v];
+                                case '$gte':
+                                    delete object[k];
+                                    return [object[Op.gte] = v];
+                                case '$gt':
+                                    delete object[k];
+                                    return [object[Op.gt] = v];
+                                case '$lte':
+                                    delete object[k];
+                                    return [object[Op.lte] = v];
+                                case '$lt':
+                                    delete object[k];
+                                    return [object[Op.lt] = v];
+                                case '$not':
+                                    delete object[k];
+                                    return [object[Op.not] = v];
+                                case '$is':
+                                    delete object[k];
+                                    return [object[Op.is] = v];
+                                case '$in':
+                                    delete object[k];
+                                    return [object[Op.in] = v];
+                                case '$notIn':
+                                    delete object[k];
+                                    return [object[Op.notIn] = v];
+                                case '$like':
+                                    delete object[k];
+                                    return [object[Op.like] = v];
+                                case '$notLike':
+                                    delete object[k];
+                                    return [object[Op.notLike] = v];
+                                case '$viLike':
+                                    delete object[k];
+                                    return [object[Op.viLike] = v];
+                                case '$notILike':
+                                    delete object[k];
+                                    return [object[Op.notILike] = v];
+                                case '$startsWith':
+                                    delete object[k];
+                                    return [object[Op.startsWith] = v];
+                                case '$endsWith':
+                                    delete object[k];
+                                    return [object[Op.endsWith] = v];
+                                case '$substring':
+                                    delete object[k];
+                                    return [object[Op.substring] = v];
+                                case '$regexp':
+                                    delete object[k];
+                                    return [object[Op.regexp] = v];
+                                case '$notRegexp':
+                                    delete object[k];
+                                    return [object[Op.notRegexp] = v];
+                                case '$iRegexp':
+                                    delete object[k];
+                                    return [object[Op.iRegexp] = v];
+                                case '$notIRegexp':
+                                    delete object[k];
+                                    return [object[Op.notIRegexp] = v];
+                                case '$between':
+                                    delete object[k];
+                                    return [object[Op.between] = v];
+                                case '$notBetween':
+                                    delete object[k];
+                                    return [object[Op.notBetween] = v];
+                                case '$overlap':
+                                    delete object[k];
+                                    return [object[Op.overlap] = v];
+                                case '$contains':
+                                    delete object[k];
+                                    return [object[Op.contains] = v];
+                                case '$contained':
+                                    delete object[k];
+                                    return [object[Op.contained] = v];
+                                case '$adjacent':
+                                    delete object[k];
+                                    return [object[Op.adjacent] = v];
+                                case '$strictLeft':
+                                    delete object[k];
+                                    return [object[Op.strictLeft] = v];
+                                case '$strictRight':
+                                    delete object[k];
+                                    return [object[Op.strictRight] = v];
+                                case '$noExtendRight':
+                                    delete object[k];
+                                    return [object[Op.noExtendRight] = v];
+                                case '$noExtendLeft':
+                                    delete object[k];
+                                    return [object[Op.noExtendLeft] = v];
+                                case '$and':
+                                    delete object[k];
+                                    return [object[Op.and] = v];
+                                case '$or ':
+                                    delete object[k];
+                                    return [object[Op.or] = v];
+                                case '$any':
+                                    delete object[k];
+                                    return [object[Op.any] = v];
+                                case '$all':
+                                    delete object[k];
+                                    return [object[Op.all] = v];
+                                case '$values':
+                                    delete object[k];
+                                    return [object[Op.values] = v];
+                                case '$col':
+                                    delete object[k];
+                                    return [object[Op.col] = v];
+                                case '$placeholder':
+                                    delete object[k];
+                                    return [object[Op.placeholder] = v];
+                                case '$join':
+                                    delete object[k];
+                                    return [object[Op.join] = v];
+                            }
+                        } else {
+                            return [module.exports.replaceOperators(v)];
+                        }
+                    })
+                )
+                : object;
+    },
 
     replaceIncludeToObject(obj, Models) {
         if (typeof (obj) === 'object') {
@@ -35,6 +174,7 @@ module.exports = {
             options.attributes.push(model.autoIncrementAttribute);
         }
         module.exports.replaceIncludeToObject(options, Models);
+        options = module.exports.replaceOperators(options)
         return options;
     },
 
