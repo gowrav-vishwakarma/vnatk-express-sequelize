@@ -278,5 +278,44 @@ There are more rich set of options applicable when using with VNATK-VUE. To know
 }
 ```
 
+# Safety and Security
+---
+VNATK-EXPRESS-SEQULIZE, while provide you endpoints to do almost anything without writing code,also provides you three levels of access controls
+- By providing access token checker middelware
+
+Example: As given in setup section to use auth middelware
+- Providing whiteList/Blacklist models
+
+Example: in your vnatk routes file plass options as follows
+
+```javascript
+var express = require('express');
+var router = express.Router();
+const vnatk = require('vnatk-express-sequelize');
+
+// Optional to use some auth middleware on this route
+//router.use(require('./middleware/adminTokenChecker'));
+
+const Models = require('../../models');
+module.exports = vnatk({ 
+    Models: Models,
+    router: router,
+    // allow only following models
+    whitelistmodels:['Products','Cart'],
+    // do not allow following models
+    blacklistmodels:['Orders','Payments']
+});
+
+```
+
+- Providing each actions authorization function in model itself
+
+Example
+
+Each action checks for `can_{action}` function in model, if found, the function is called `by passing request object`. on receiving `===` true only then the related action is executed.
+
+three default actions for basic crud options are `vnatk_add`, `vnatk_edit` and `vnatk_delete`. To make authorization related to these actions you may created `can_vnatk_add`, `can_vnatk_edit` and `can_vnatk_delete` function in models respectiley.
+
+
 Under development:
 Authorization and ACL based on each Model or record is under development
