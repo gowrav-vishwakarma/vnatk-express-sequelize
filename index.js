@@ -18,11 +18,20 @@ module.exports = function (options) {
         throw new Error('you must pass router like "router : express.Router()" in options');
     }
 
+
     const Models = options.Models;
     const router = options.router;
 
     router.post('/crud', async function (req, res, next) {
         var model = Models[req.body.model];
+
+        if (
+            (_.has(options, 'whitelistmodels') && !options.whitelistmodels.includes(req.body.model))
+            || (_.has(options, 'blacklistmodels') && options.blacklistmodels.includes(req.body.model))
+        ) {
+            res.status(500).send({ error: true, Message: 'Model ' + req.body.model + ' is not allowed to process' });
+            return
+        }
 
         if (!model) {
             res.status(500).send({ error: true, Message: 'Model ' + req.body.model + ' not found' });
@@ -105,6 +114,12 @@ module.exports = function (options) {
         }
 
         if (action.name == 'vnatk_add') {
+            if (_.has(model, 'can_vnatk_add') || _.has(model.__proto__, 'can_vnatk_add')) {
+                if (model.can_vnatk_add(req) !== true) {
+                    res.status(500).send({ error: true, Message: 'Adding on model ' + req.body.model + ' is not allowed by authorization functions' });
+                    return;
+                }
+            }
             VNATKServerHelpers.createNew(model, item, senitizedmodeloptions).then((cretedRecord) => {
                 res.send({ row_data: cretedRecord, message: 'Record added successfully' });
                 return;
@@ -116,6 +131,13 @@ module.exports = function (options) {
             });
         }
         else if (action.name == 'vnatk_edit') {
+            if (_.has(model, 'can_vnatk_edit') || _.has(model.__proto__, 'can_vnatk_edit')) {
+                if (model.can_vnatk_edit(req) !== true) {
+                    res.status(500).send({ error: true, Message: 'Editing on model ' + req.body.model + ' is not allowed by authorization functions' });
+                    return;
+                }
+            }
+
             var editedData = await VNATKServerHelpers.editRecord(model, item, senitizedmodeloptions).catch(error => {
                 res.status(VNATKServerHelpers.getErrorCode(error));
                 throw error;
@@ -127,6 +149,12 @@ module.exports = function (options) {
             return;
         }
         else if (action.name == 'vnatk_delete') {
+            if (_.has(model, 'can_vnatk_delete') || _.has(model.__proto__, 'can_vnatk_delete')) {
+                if (model.can_vnatk_delete(req) !== true) {
+                    res.status(500).send({ error: true, Message: 'Deleting on model ' + req.body.model + ' is not allowed by authorization functions' });
+                    return;
+                }
+            }
             var id = item[model.autoIncrementAttribute];
             var where_condition = {};
             where_condition[model.autoIncrementAttribute] = id;
@@ -142,6 +170,12 @@ module.exports = function (options) {
             return;
         } else if (action.name == 'vnatk_autobulkimport') {
         } else {
+            if (_.has(model, 'can_' + action.execute) || _.has(model.__proto__, 'can_' + action.execute)) {
+                if (model['can_' + action.execute](req) !== true) {
+                    res.status(500).send({ error: true, Message: 'Executing ' + action.execute + ' on model ' + req.body.model + ' is not allowed by authorization functions' });
+                    return;
+                }
+            }
             // is it for : Single, multiple, none, all
             var m_loaded = await model.unscoped();
 
