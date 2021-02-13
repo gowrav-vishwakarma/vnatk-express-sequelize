@@ -46,6 +46,8 @@ module.exports = {
                 break
             case 'BOOLEAN':
                 t['type'] = 'checkbox';
+                t['true-value'] = true;
+                t['false-value'] = '0';
                 break
             case 'INTEGER':
                 t['type'] = 'number'
@@ -61,6 +63,9 @@ module.exports = {
                 t['type'] = 'number'
                 t['isIdField'] = true
                 t['hide'] = true
+                break
+            case 'TEXT':
+                t['type'] = 'textarea'
                 break
             default:
                 t = { type: 'text' };

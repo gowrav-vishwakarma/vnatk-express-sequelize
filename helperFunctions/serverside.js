@@ -309,6 +309,37 @@ module.exports = {
         return [deleteAction];
     },
 
+    async vnatkAutoImport(model, resbody) {
+        var importdata = resbody.importdata;
+        var transaction_mode = resbody.transaction.toLowerCase();
+
+        var transaction = null;
+        try {
+            if (transaction_mode === 'file') transaction = await sequelize.transaction();
+            // Actual import code
+            for (let index = 0; index < importdata.length; index++) {
+                const item = importdata[index];
+                try {
+                    if (transaction_mode === 'row') transaction = await sequelize.transaction();
+                    // Importing root level item
+                    module.exports.AutoImportItem(item);
+                    if (transaction_mode === 'row') await transaction.commit();
+                } catch (err) {
+                    if (transaction_mode === 'row') await transaction.rollback();
+                    if (transaction_mode === 'file') throw err;
+                }
+            }
+            if (transaction_mode === 'file') await transaction.commit();
+        } catch (err) {
+            if (transaction_mode === 'file') await transaction.rollback();
+        }
+
+    },
+
+    AutoImportItem(item) {
+
+    },
+
     injectActionColumn() {
         return {
             text: 'Actions',

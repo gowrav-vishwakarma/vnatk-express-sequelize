@@ -5,7 +5,7 @@ const { sequelize } = require('./models');
 
 
 before(async () => {
-    await sequelize.sync();
+    await sequelize.sync({ force: true });
 });
 
 describe('Minimum setup testing', function () {
@@ -22,17 +22,24 @@ describe('Minimum setup testing', function () {
             .get('/')
             .expect(200, done);
     });
-    it('responds to /vnatk/crud', function testSlash(done) {
+    it('responds to /vnatk/crud with correct model', function testSlash(done) {
+        request(server)
+            .post('/vnatk/crud')
+            .send({ model: 'User' })
+            .expect((res) => {
+                assert.deepStrictEqual(res.body, { data: [] });
+            })
+            .expect(200, done);
+    });
+    it('responds to /vnatk/crud with wrong model', function testSlash(done) {
         request(server)
             .post('/vnatk/crud')
             .send({ model: '_User' })
-            .expect(500)
-            .then(res => {
+            .expect(res => {
                 assert(res.body.error, true)
-                assert.equal(res.body.Message, 'Model _User not found')
-                done();
+                assert.strictEqual(res.body.Message, 'Model _User not found')
             })
-            .catch(err => done(err))
+            .expect(500, done);
     });
 
     it('404 everything else', function testPath(done) {
