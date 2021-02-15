@@ -11,17 +11,13 @@ before(async () => {
 describe('Minimum setup testing', function () {
     var server;
     server = require('../testapp', { bustCache: true });
-    // beforeEach(function () {
-    // server = require('../testapp', { bustCache: true });
-    // });
-    // afterEach(function (done) {
-    //     server.close(done);
-    // });
+
     it('responds to /', function testSlash(done) {
         request(server)
             .get('/')
             .expect(200, done);
     });
+
     it('responds to /vnatk/crud with correct model', function testSlash(done) {
         request(server)
             .post('/vnatk/crud')

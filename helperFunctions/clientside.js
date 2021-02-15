@@ -84,8 +84,8 @@ module.exports = {
                 var opt = _.pick(model.associations[key].options, ['foreignKey', 'as', 'validate', 'indexes', 'name', 'onDelete', 'onUpdate']);
 
                 opt.associationType = model.associations[key].associationType;
+                opt.model = model.associations[key].target.name;
                 if (model.associations[key].through) {
-                    opt.model = model.associations[key].target.name;
                     opt.through = {
                         model: model.associations[key].through.model.name
                     }
