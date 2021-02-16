@@ -46,6 +46,8 @@ module.exports = {
                 break
             case 'BOOLEAN':
                 t['type'] = 'checkbox';
+                t['true-value'] = true;
+                t['false-value'] = '0';
                 break
             case 'INTEGER':
                 t['type'] = 'number'
@@ -61,6 +63,12 @@ module.exports = {
                 t['type'] = 'number'
                 t['isIdField'] = true
                 t['hide'] = true
+                break
+            case 'TEXT':
+                t['type'] = 'textarea'
+                break
+            case 'DATE':
+                t['type'] = 'date-picker'
                 break
             default:
                 t = { type: 'text' };
@@ -79,8 +87,8 @@ module.exports = {
                 var opt = _.pick(model.associations[key].options, ['foreignKey', 'as', 'validate', 'indexes', 'name', 'onDelete', 'onUpdate']);
 
                 opt.associationType = model.associations[key].associationType;
+                opt.model = model.associations[key].target.name;
                 if (model.associations[key].through) {
-                    opt.model = model.associations[key].target.name;
                     opt.through = {
                         model: model.associations[key].through.model.name
                     }

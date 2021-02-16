@@ -3,13 +3,20 @@ module.exports = (sequelize, DataTypes) => {
         title: DataTypes.STRING,
         imageUrl: DataTypes.STRING,
         description: DataTypes.TEXT,
-        userId: DataTypes.INTEGER
+        adminId: DataTypes.INTEGER
     }, {});
     Project.associate = function (models) {
         // associations can be defined here
         Project.belongsTo(models.User, {
-            foreignKey: 'userId',
-            onDelete: 'CASCADE'
+            foreignKey: 'adminId',
+            onDelete: 'CASCADE',
+            as: 'ProjectAdmin'
+        })
+        Project.belongsToMany(models.User, {
+            foreignKey: 'adminId',
+            onDelete: 'CASCADE',
+            as: 'ProjectUsers',
+            through: models.UserProjects
         })
     };
     return Project;

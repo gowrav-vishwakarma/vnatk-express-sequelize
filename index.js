@@ -168,7 +168,10 @@ module.exports = function (options) {
             });
             res.send({ message: 'Record deleted' });
             return;
-        } else if (action.name == 'vnatk_autobulkimport') {
+        } else if (action.name == 'vnatk_autoimport') {
+            var response = VNATKServerHelpers.vnatkAutoImport(model, req.body, Models).catch(err => { throw err });
+            res.send({ message: 'Import done', response: response });
+            return
         } else {
             if (_.has(model, 'can_' + action.execute) || _.has(model.__proto__, 'can_' + action.execute)) {
                 if (model['can_' + action.execute](req) !== true) {
