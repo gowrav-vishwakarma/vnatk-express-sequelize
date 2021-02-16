@@ -346,7 +346,10 @@ module.exports = {
 
     },
 
-    async AutoImportItem(model, item, Models, AdditionalWhere = {}) {
+    async AutoImportItem(model, item, Models, AdditionalWhere = {}, relation = 'none') {
+        if (_.has(item, 'assignedOn')) {
+            let x = 2;
+        }
         var item_orig = JSON.parse(JSON.stringify(item));
 
         let $vnatk_data_handle = 'alwaysCreate';
@@ -386,7 +389,7 @@ module.exports = {
             if (_.has(item_orig, item_belongsto_relation.as)) {
                 itemBelongsTo[index]['item'] = await module.exports.AutoImportItem(Models[item_belongsto_relation.model], item_orig[item_belongsto_relation.as], Models).catch(err => { throw err });
                 item[item_belongsto_relation.foreignKey] = itemBelongsTo[index]['item'][model.autoIncrementAttribute];
-                if ($vnatk_find_options.modeloptions && $vnatk_find_options.modeloptions[item_belongsto_relation.foreignKey] === true)
+                if (!$vnatk_find_options.modeloptions || $vnatk_find_options.modeloptions[item_belongsto_relation.foreignKey] !== false)
                     AdditionalWhere[item_belongsto_relation.foreignKey] = item[item_belongsto_relation.foreignKey];
                 delete item[item_belongsto_relation.as];
             }
@@ -417,6 +420,9 @@ module.exports = {
             senitizedmodeloptions = module.exports.senitizeModelOptions($vnatk_find_options.modeloptions, model, Models);
         }
         senitizedmodeloptions = Object.assign(senitizedmodeloptions, AdditionalWhere);
+        if (relation === 'BelongsToMany' && !$vnatk_find_options.modeloptions) {
+            senitizedmodeloptions = AdditionalWhere;
+        }
         let t = undefined;
 
         switch ($vnatk_data_handle.toLowerCase()) {
@@ -511,7 +517,7 @@ module.exports = {
                     // if (thisitemdetails.$vnatk_find_options && thisitemdetails.$vnatk_find_options.modeloptions && thisitemdetails.$vnatk_find_options.modeloptions[thisbelongstomanyrelation.foreignKey] === false) {
                     //     AddWhere = {};
                     // }
-                    await module.exports.AutoImportItem(Models[thisbelongstomanyrelation.through.model], thisitemdetails, Models, AddWhere).catch(err => { throw err });
+                    await module.exports.AutoImportItem(Models[thisbelongstomanyrelation.through.model], thisitemdetails, Models, AddWhere, 'BelongsToMany').catch(err => { throw err });
                 }
                 delete item[thisbelongstomanyrelation.as];
             }
