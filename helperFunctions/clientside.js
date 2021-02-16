@@ -67,6 +67,9 @@ module.exports = {
             case 'TEXT':
                 t['type'] = 'textarea'
                 break
+            case 'DATE':
+                t['type'] = 'date-picker'
+                break
             default:
                 t = { type: 'text' };
                 break;

@@ -326,11 +326,16 @@ module.exports = {
                     if (transaction_mode === 'row') transaction = await model.sequelize.transaction();
                     // Importing root level item
                     console.log('importing ', item)
-                    module.exports.AutoImportItem(model, item, Models);
+                    module.exports.AutoImportItem(model, item, Models).catch(err => { throw err });
                     if (transaction_mode === 'row') await transaction.commit();
                 } catch (err) {
-                    if (transaction_mode === 'row') await transaction.rollback();
-                    if (transaction_mode === 'file') throw err;
+                    if (transaction_mode === 'row') {
+                        await transaction.rollback();
+                        throw err;
+                    }
+                    if (transaction_mode === 'file') {
+                        throw err;
+                    }
                 }
             }
             if (transaction_mode === 'file') await transaction.commit();
@@ -341,7 +346,7 @@ module.exports = {
 
     },
 
-    async AutoImportItem(model, item, Models, skipSelf = false, skipBelongsTo = false, skipHasMany = false, skipBelongsToMany = false) {
+    async AutoImportItem(model, item, Models, AdditionalWhere = {}) {
         var item_orig = JSON.parse(JSON.stringify(item));
 
         let $vnatk_data_handle = 'alwaysCreate';
@@ -376,17 +381,17 @@ module.exports = {
         // console.log('associations', associations);
 
         // perform the same recursive with belongsTo first and save their foreignKeys for this table
-        if (!skipBelongsTo) {
-            for (let index = 0; index < itemBelongsTo.length; index++) {
-                let item_belongsto_relation = itemBelongsTo[index];
-                if (_.has(item_orig, item_belongsto_relation.as)) {
-                    itemBelongsTo[index]['item'] = await module.exports.AutoImportItem(Models[item_belongsto_relation.model], item_orig[item_belongsto_relation.as], Models);
-                    item[item_belongsto_relation.foreignKey] = itemBelongsTo[index]['item'][model.autoIncrementAttribute];
-                    delete item[item_belongsto_relation.as];
-                }
+        for (let index = 0; index < itemBelongsTo.length; index++) {
+            let item_belongsto_relation = itemBelongsTo[index];
+            if (_.has(item_orig, item_belongsto_relation.as)) {
+                itemBelongsTo[index]['item'] = await module.exports.AutoImportItem(Models[item_belongsto_relation.model], item_orig[item_belongsto_relation.as], Models).catch(err => { throw err });
+                item[item_belongsto_relation.foreignKey] = itemBelongsTo[index]['item'][model.autoIncrementAttribute];
+                if ($vnatk_find_options.modeloptions && $vnatk_find_options.modeloptions[item_belongsto_relation.foreignKey] === true)
+                    AdditionalWhere[item_belongsto_relation.foreignKey] = item[item_belongsto_relation.foreignKey];
+                delete item[item_belongsto_relation.as];
             }
-            // console.log('itemBelongsTo', itemBelongsTo);
         }
+        // console.log('itemBelongsTo', itemBelongsTo);
 
         // get belongsToMany item ready by solving all other models, once we save thismdoel we will fill our ID and run the loop again
         for (let index = 0; index < itemBelongsToMany.length; index++) {
@@ -411,20 +416,20 @@ module.exports = {
         if ($vnatk_find_options.modeloptions) {
             senitizedmodeloptions = module.exports.senitizeModelOptions($vnatk_find_options.modeloptions, model, Models);
         }
+        senitizedmodeloptions = Object.assign(senitizedmodeloptions, AdditionalWhere);
         let t = undefined;
 
         switch ($vnatk_data_handle.toLowerCase()) {
             case 'alwayscreate':
-                if (!skipSelf)
-                    item = await model.create(item, { logging: console.log }).catch(err => {
-                        throw err
-                    });
+                item = await model.create(item, { logging: console.log }).catch(err => {
+                    throw err
+                });
                 break;
             case 'findorcreate':
                 t = await model.findOne({ where: senitizedmodeloptions }).catch(err => {
                     throw err
                 });
-                if (!t && !skipSelf) {
+                if (!t) {
                     t = await model.create(item, { logging: console.log }).catch(err => {
                         throw err
                     });
@@ -435,7 +440,7 @@ module.exports = {
                 t = await model.findOne({ where: senitizedmodeloptions }).catch(err => {
                     throw err
                 });
-                if (!t && !skipSelf) {
+                if (!t) {
                     t = await model.create(item, { logging: console.log }).catch(err => {
                         throw err
                     });
@@ -471,44 +476,47 @@ module.exports = {
                 break;
             default:
                 throw new Error($vnatk_data_handle + ' is not accepted value at ' + JSON.stringify(item))
-                break;
         }
 
-        if (!skipHasMany) {
-            for (let index = 0; index < itemHasMany.length; index++) {
-                const thishasmanyrelation = itemHasMany[index];
-                if (_.has(item_orig, thishasmanyrelation.as)) {
-                    for (let j = 0; j < item_orig[thishasmanyrelation.as].length; j++) {
-                        let thisitemdetails = item_orig[thishasmanyrelation.as][j];
-                        let id_merge = {};
-                        id_merge[thishasmanyrelation.foreignKey] = item[model.autoIncrementAttribute];
-                        thisitemdetails = Object.assign(thisitemdetails, id_merge);
-                        await module.exports.AutoImportItem(Models[thishasmanyrelation.model], thisitemdetails, Models)
-                    }
-                    delete item[thishasmanyrelation.as];
+        for (let index = 0; index < itemHasMany.length; index++) {
+            const thishasmanyrelation = itemHasMany[index];
+            if (_.has(item_orig, thishasmanyrelation.as)) {
+                for (let j = 0; j < item_orig[thishasmanyrelation.as].length; j++) {
+                    let thisitemdetails = item_orig[thishasmanyrelation.as][j];
+                    let id_merge = {};
+                    id_merge[thishasmanyrelation.foreignKey] = item[model.autoIncrementAttribute];
+                    thisitemdetails = Object.assign(thisitemdetails, id_merge);
+                    let AddWhere = id_merge;
+                    // if (thisitemdetails.$vnatk_find_options && thisitemdetails.$vnatk_find_options.modeloptions && thisitemdetails.$vnatk_find_options.modeloptions[thisbelongstomanyrelation.foreignKey] === false) {
+                    //     let AddWhere = {};
+                    // }
+                    await module.exports.AutoImportItem(Models[thishasmanyrelation.model], thisitemdetails, Models, AddWhere).catch(err => { throw err })
                 }
+                delete item[thishasmanyrelation.as];
             }
-            // console.log('itemHasMany', itemHasMany);
         }
+        // console.log('itemHasMany', itemHasMany);
 
         // do the hasMany and belongsToMany now
-        if (!skipBelongsToMany) {
-            // get belongsToMany item ready by solving all other models, once we save thismdoel we will fill our ID and run the loop again
-            for (let index = 0; index < itemBelongsToMany.length; index++) {
-                let thisbelongstomanyrelation = itemBelongsToMany[index];
-                if (_.has(item_orig, thisbelongstomanyrelation.as)) {
-                    for (let j = 0; j < item_orig[thisbelongstomanyrelation.as].length; j++) {
-                        let thisitemdetails = item_orig[thisbelongstomanyrelation.as][j];
-                        let id_merge = {};
-                        id_merge[thisbelongstomanyrelation.foreignKey] = item[model.autoIncrementAttribute];
-                        thisitemdetails = Object.assign(thisitemdetails, id_merge);
-                        await module.exports.AutoImportItem(Models[thisbelongstomanyrelation.through.model], thisitemdetails, Models);
-                    }
-                    delete item[thisbelongstomanyrelation.as];
+        // get belongsToMany item ready by solving all other models, once we save thismdoel we will fill our ID and run the loop again
+        for (let index = 0; index < itemBelongsToMany.length; index++) {
+            let thisbelongstomanyrelation = itemBelongsToMany[index];
+            if (_.has(item_orig, thisbelongstomanyrelation.as)) {
+                for (let j = 0; j < item_orig[thisbelongstomanyrelation.as].length; j++) {
+                    let thisitemdetails = item_orig[thisbelongstomanyrelation.as][j];
+                    let id_merge = {};
+                    id_merge[thisbelongstomanyrelation.foreignKey] = item[model.autoIncrementAttribute];
+                    thisitemdetails = Object.assign(thisitemdetails, id_merge);
+                    let AddWhere = id_merge;
+                    // if (thisitemdetails.$vnatk_find_options && thisitemdetails.$vnatk_find_options.modeloptions && thisitemdetails.$vnatk_find_options.modeloptions[thisbelongstomanyrelation.foreignKey] === false) {
+                    //     AddWhere = {};
+                    // }
+                    await module.exports.AutoImportItem(Models[thisbelongstomanyrelation.through.model], thisitemdetails, Models, AddWhere).catch(err => { throw err });
                 }
+                delete item[thisbelongstomanyrelation.as];
             }
-            // console.log('itemBelongsToMany', itemBelongsToMany);
         }
+        // console.log('itemBelongsToMany', itemBelongsToMany);
         return item;
     },
 

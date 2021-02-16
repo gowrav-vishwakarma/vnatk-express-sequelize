@@ -169,7 +169,7 @@ module.exports = function (options) {
             res.send({ message: 'Record deleted' });
             return;
         } else if (action.name == 'vnatk_autoimport') {
-            var response = VNATKServerHelpers.vnatkAutoImport(model, req.body, Models);
+            var response = VNATKServerHelpers.vnatkAutoImport(model, req.body, Models).catch(err => { throw err });
             res.send({ message: 'Import done', response: response });
             return
         } else {
