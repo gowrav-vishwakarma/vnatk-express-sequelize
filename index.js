@@ -49,13 +49,13 @@ module.exports = function (options) {
         var ModelActions = [];
         var returnData = {};
         if (req.body.read && req.body.read.headers) {
-            var ModelHeaders = VNATKServerHelpers.getHeadersAndDeRef(model, req);
+            var ModelHeaders = VNATKServerHelpers.getHeadersAndDeRef(model, req, Models);
             if (req.body.actions) ModelHeaders = [...ModelHeaders, VNATKServerHelpers.injectActionColumn()];
         }
 
-        if (req.body.create !== false) ModelActions = [...ModelActions, ...VNATKServerHelpers.injectAddAction(model, req)];
-        if (req.body.update !== false) ModelActions = [...ModelActions, ...VNATKServerHelpers.injectEditAction(model, req)];
-        if (req.body.delete !== false) ModelActions = [...ModelActions, ...VNATKServerHelpers.injectDeleteAction(model, req)];
+        if (req.body.create !== false) ModelActions = [...ModelActions, ...VNATKServerHelpers.injectAddAction(model, req, Models)];
+        if (req.body.update !== false) ModelActions = [...ModelActions, ...VNATKServerHelpers.injectEditAction(model, req, Models)];
+        if (req.body.delete !== false) ModelActions = [...ModelActions, ...VNATKServerHelpers.injectDeleteAction(model, req, Models)];
         if (_.has(model, 'vnAtkGetActions') || _.has(model.__proto__, 'vnAtkGetActions')) {
             if (req.body.actions) {
                 ModelActions = [...ModelActions, ...model.vnAtkGetActions()];
@@ -64,7 +64,8 @@ module.exports = function (options) {
 
         var data;
         if (req.body.read.data !== false) {
-            const senitizedmodeloptions = VNATKServerHelpers.senitizeModelOptions(req.body.read.modeloptions, model, Models);
+            var senitizedmodeloptions = VNATKServerHelpers.senitizeModelOptions(req.body.read.modeloptions, model, Models);
+            // console.log('senitizedmodeloptions', senitizedmodeloptions);
             // Paginate data
             if (req.body.read.serversidepagination) {
                 senitizedmodeloptions.distinct = true
@@ -74,7 +75,7 @@ module.exports = function (options) {
                     // res.end();
                 });
                 if (data) {
-                    returnData['datacount'] = data.count;
+                    returnData['datacount'] = Array.isArray(data.count) ? data.count.count : data.count;
                     data = data.rows;
                 }
             } else {
@@ -105,7 +106,7 @@ module.exports = function (options) {
         }
 
         if (req.body.read && req.body.read.headers) {
-            VNATKServerHelpers.getHeadersAndDeRef(model, req);
+            VNATKServerHelpers.getHeadersAndDeRef(model, req, Models);
         }
 
         var senitizedmodeloptions;
@@ -169,7 +170,7 @@ module.exports = function (options) {
             res.send({ message: 'Record deleted' });
             return;
         } else if (action.name == 'vnatk_autoimport') {
-            var response = VNATKServerHelpers.vnatkAutoImport(model, req.body, Models).catch(err => { throw err });
+            var response = await VNATKServerHelpers.vnatkAutoImport(model, req.body, Models).catch(err => { throw err });
             res.send({ message: 'Import done', response: response });
             return
         } else {
