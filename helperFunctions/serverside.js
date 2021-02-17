@@ -131,7 +131,15 @@ module.exports = {
     },
 
     replaceIncludeToObject(obj, Models) {
-        if (typeof (obj) === 'object') {
+        if (Array.isArray(obj)) {
+            for (let index = 0; index < obj.length; index++) {
+                const element = obj[index];
+                module.exports.replaceIncludeToObject(element, Models);
+                if (typeof element == 'object' && _.has(element, 'fn')) {
+                    obj[index] = [Models.sequelize.fn(element.fn, element.col), element.as];
+                }
+            }
+        } else if (typeof (obj) === 'object') {
             for (const [key, value] of Object.entries(obj)) {
                 if (key == 'model') {
                     // handle scopes from text
@@ -144,6 +152,7 @@ module.exports = {
                         }
                     }
                 }
+
                 if (_.keys(operators).includes(key)) {
                     module.exports.replaceOperators(obj, key, value);
                 }
@@ -151,11 +160,6 @@ module.exports = {
                 if (typeof (value) === 'object') {
                     module.exports.replaceIncludeToObject(value, Models);
                 }
-            }
-        } else if (Array.isArray(obj)) {
-            for (let index = 0; index < obj.length; index++) {
-                const element = obj[index];
-                module.exports.replaceIncludeToObject(element, Models);
             }
         }
     },

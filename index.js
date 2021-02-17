@@ -65,8 +65,7 @@ module.exports = function (options) {
         var data;
         if (req.body.read.data !== false) {
             var senitizedmodeloptions = VNATKServerHelpers.senitizeModelOptions(req.body.read.modeloptions, model, Models);
-            // senitizedmodeloptions.include[0].attributes = [[model.sequelize.fn('COUNT', model.sequelize.col('*')), 'AdminProjs']];
-            // console.log('senitizedmodeloptions', senitizedmodeloptions.include[0].attributes);
+            // console.log('senitizedmodeloptions', senitizedmodeloptions);
             // Paginate data
             if (req.body.read.serversidepagination) {
                 senitizedmodeloptions.distinct = true
@@ -76,7 +75,7 @@ module.exports = function (options) {
                     // res.end();
                 });
                 if (data) {
-                    returnData['datacount'] = data.count;
+                    returnData['datacount'] = Array.isArray(data.count) ? data.count.count : data.count;
                     data = data.rows;
                 }
             } else {
