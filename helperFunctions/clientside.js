@@ -3,7 +3,7 @@ const VNATKServerHelpers = require('./serverside');
 
 
 module.exports = {
-    generateFormSchemaFromModel: function (model, fields) {
+    generateFormSchemaFromModel: function (model, fields, Models) {
         const ModelAssociations = module.exports.getAssociations(model);
 
         const rawAttributes = model.rawAttributes;
@@ -22,7 +22,7 @@ module.exports = {
             schema[element] = Object.assign({
                 label: modelField.caption ? modelField.caption : modelField.fieldName
             },
-                module.exports.sequliseToFormSchemaType(modelField, ModelAssociations)
+                module.exports.sequliseToFormSchemaType(modelField, ModelAssociations, Models)
             );
             if (modelField.primaryKey) schema[element].primaryKey = true;
             if (modelField.isSystem) schema[element].isSystem = true;
@@ -30,8 +30,8 @@ module.exports = {
         return schema;
     },
 
-    sequliseToFormSchemaType: function (field, ModelAssociations) {
-
+    sequliseToFormSchemaType: function (field, ModelAssociations, Models) {
+        if (_.has(field, 'ui')) return field.ui;
         var t = { type: 'text' };
         switch (field.type.constructor.name) {
             case 'STRING':
@@ -54,7 +54,13 @@ module.exports = {
                 if (_.has(field, 'references')) {
                     t.references = field.references;
                     t.association = ModelAssociations[_.findIndex(ModelAssociations, (as) => { return as.foreignKey == field.fieldName })];
-                    if (t.association) t.type = 'autocomplete';
+                    if (t.association) {
+                        t.type = 'autocomplete';
+                        if (_.has(Models[t.association.model], 'titlefield')) {
+                            t.titlefield = Models[t.association.model].titlefield
+                            t.searchfield = Models[t.association.model].titlefield
+                        }
+                    }
                     t.searchInput = "";
                     t['no-filter'] = true;
                 }

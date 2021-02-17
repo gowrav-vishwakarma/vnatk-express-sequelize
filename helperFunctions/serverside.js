@@ -170,7 +170,7 @@ module.exports = {
 
 
 
-    getHeadersAndDeRef: function (model, req) {
+    getHeadersAndDeRef: function (model, req, Models) {
         const associations = VNATKClientHelpers.getAssociations(model);
         var fields = undefined;
         if (req.body.read && req.body.read.modeloptions && req.body.read.modeloptions.attributes) fields = req.body.read.modeloptions.attributes;
@@ -208,12 +208,13 @@ module.exports = {
                 })
                 continue;
             }
+            if (Array.isArray(fld) || typeof fld === 'object') continue; // mostly looks aggregate functions object
             const assosIndex = associations.findIndex(o => o.foreignKey == fields_info[fld].fieldName);
             if (req.body.read && req.body.read.autoderef && assosIndex > -1) {
                 // ASSOCIATION found, belongsTo field
                 field_headers.push({
                     text: associations[assosIndex].name.singular,
-                    value: associations[assosIndex].name.singular + '.name', //TODO get titlefield from model
+                    value: associations[assosIndex].name.singular + '.' + (Models[associations[assosIndex].model].titlefield ? Models[associations[assosIndex].model].titlefield : 'name'), //TODO get titlefield from model
                     sortable: fields_info[fld].sortable ? fields_info[fld].sortable : true,
                 })
                 // TODO add in model include if not set
@@ -265,7 +266,7 @@ module.exports = {
         return m_loaded;
     },
 
-    injectAddAction: function (model, req) {
+    injectAddAction: function (model, req, Models) {
         var addFields = undefined;
         if (req.body.create && req.body.create.modeloptions && req.body.create.modeloptions.attributes) addFields = req.body.create.modeloptions.attributes;
         var addAction = {
@@ -273,12 +274,12 @@ module.exports = {
             caption: 'Add',
             type: 'NoRecord',
 
-            formschema: VNATKClientHelpers.generateFormSchemaFromModel(model, addFields)
+            formschema: VNATKClientHelpers.generateFormSchemaFromModel(model, addFields, Models)
         }
         return [addAction];
     },
 
-    injectEditAction: function (model, req) {
+    injectEditAction: function (model, req, Models) {
         var editFields = undefined;
         if (req.body.update && req.body.update.modeloptions && req.body.update.modeloptions.attributes) editFields = req.body.update.modeloptions.attributes;
         var editAction = {
@@ -286,12 +287,12 @@ module.exports = {
             caption: 'Edit',
             type: 'single',
             placeIn: 'buttonGroup',
-            formschema: VNATKClientHelpers.generateFormSchemaFromModel(model, editFields)
+            formschema: VNATKClientHelpers.generateFormSchemaFromModel(model, editFields, Models)
         }
         return [editAction];
     },
 
-    injectDeleteAction: function (model, req) {
+    injectDeleteAction: function (model, req, Models) {
         var deleteAction = {
             name: 'vnatk_delete',
             caption: 'Delete',
@@ -326,7 +327,7 @@ module.exports = {
                     if (transaction_mode === 'row') transaction = await model.sequelize.transaction();
                     // Importing root level item
                     console.log('importing ', item)
-                    module.exports.AutoImportItem(model, item, Models).catch(err => { throw err });
+                    await module.exports.AutoImportItem(model, item, Models).catch(err => { throw err });
                     if (transaction_mode === 'row') await transaction.commit();
                 } catch (err) {
                     if (transaction_mode === 'row') {
@@ -470,8 +471,10 @@ module.exports = {
                 });
                 if (t)
                     item = t;
-                else
+                else {
+                    console.log('findtoassociate where condition ', { where: senitizedmodeloptions });
                     throw new Error(JSON.stringify(item) + ' not found');
+                }
                 break;
             case 'associateiffound':
                 t = await model.findOne({ where: senitizedmodeloptions }).catch(err => {
