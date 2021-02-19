@@ -224,9 +224,9 @@ module.exports = {
                 // TODO add in model include if not set
                 if (!req.body.read.modeloptions.include) req.body.read.modeloptions.include = [];
                 inArrayAsString = req.body.read.modeloptions.include.includes(associations[assosIndex].name.singular);
-                inArrayAsObjectInclude = req.body.read.modeloptions.include.findIndex(o => o.model == associations[assosIndex].name.singular);
+                inArrayAsObjectInclude = req.body.read.modeloptions.include.findIndex(o => (o.model == associations[assosIndex].name.singular) || (o.as && o.as == associations[assosIndex].name.singular));
                 if (!inArrayAsString && inArrayAsObjectInclude == -1) {
-                    req.body.read.modeloptions.include.push(associations[assosIndex].name.singular);
+                    req.body.read.modeloptions.include.push(associations[assosIndex].as ? associations[assosIndex].as : associations[assosIndex].name.singular);
                 }
 
             } else {
