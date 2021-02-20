@@ -42,7 +42,7 @@ module.exports = function (options) {
 
         if (req.body.read && req.body.read.modelscope !== undefined) {
             if (req.body.read.modelscope == false) model = model.unscoped();
-            if (typeof req.body.read.modelscope === 'string') model.scope(req.body.read.modelscope);
+            if (typeof req.body.read.modelscope === 'string') model = model.scope(req.body.read.modelscope);
         }
 
 
