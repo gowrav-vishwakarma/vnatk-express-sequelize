@@ -6,7 +6,6 @@ module.exports = (sequelize, DataTypes) => {
         adminId: DataTypes.INTEGER
     }, {});
     Project.associate = function (models) {
-        // associations can be defined here
         Project.belongsTo(models.User, {
             foreignKey: 'adminId',
             onDelete: 'CASCADE',

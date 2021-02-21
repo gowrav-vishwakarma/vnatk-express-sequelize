@@ -330,7 +330,7 @@ module.exports = {
                 try {
                     if (transaction_mode === 'row') transaction = await model.sequelize.transaction();
                     // Importing root level item
-                    console.log('importing ', item)
+                    // console.log('importing ', item)
                     await module.exports.AutoImportItem(model, item, Models).catch(err => { throw err });
                     if (transaction_mode === 'row') await transaction.commit();
                 } catch (err) {

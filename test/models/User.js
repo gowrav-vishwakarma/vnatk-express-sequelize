@@ -7,6 +7,10 @@ module.exports = (sequelize, DataTypes) => {
     }, {});
     User.associate = function (models) {
         // associations can be defined here
+        User.belongsTo(models.Group, {
+            foreignKey: 'groupId',
+            as: 'Group'
+        })
         User.hasMany(models.Project, {
             foreignKey: 'adminId',
             as: 'ProjectsOwned'

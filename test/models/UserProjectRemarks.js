@@ -3,7 +3,6 @@ module.exports = (sequelize, DataTypes) => {
         remarks: DataTypes.STRING,
     }, {});
     UserProjectRemarks.associate = function (models) {
-        // associations can be defined here
         UserProjectRemarks.belongsTo(models.UserProjects, {
             foreignKey: 'userProjectId',
             as: 'ProjectRemarks'

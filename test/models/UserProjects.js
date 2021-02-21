@@ -5,7 +5,6 @@ module.exports = (sequelize, DataTypes) => {
         isDone: DataTypes.BOOLEAN,
     }, {});
     UserProjects.associate = function (models) {
-        // associations can be defined here
         UserProjects.belongsTo(models.Project, {
             foreignKey: 'projectId'
         });

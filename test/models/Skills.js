@@ -8,11 +8,6 @@ module.exports = (sequelize, DataTypes) => {
             foreignKey: 'userId',
             as: 'SkillOwner'
         })
-        // User.hasMany(models.Project, {
-        //     foreignKey: 'adminId',
-        //     as: 'Projects',
-        //     through: models.UserProjects
-        // })
     };
     return Skill;
 };
