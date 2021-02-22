@@ -331,7 +331,7 @@ module.exports = {
                     if (transaction_mode === 'row') transaction = await model.sequelize.transaction();
                     // Importing root level item
                     // console.log('importing ', item)
-                    await module.exports.AutoImportItem(model, item, Models).catch(err => { throw err });
+                    await module.exports.AutoImportItem(model, item, Models, undefined, undefined, transaction).catch(err => { throw err });
                     if (transaction_mode === 'row') await transaction.commit();
                 } catch (err) {
                     if (transaction_mode === 'row') {
@@ -351,7 +351,7 @@ module.exports = {
 
     },
 
-    async AutoImportItem(model, item, Models, AdditionalWhere = {}, relation = 'none') {
+    async AutoImportItem(model, item, Models, AdditionalWhere = {}, relation = 'none', transaction) {
         if (_.has(item, 'assignedOn')) {
             let x = 2;
         }
@@ -392,7 +392,7 @@ module.exports = {
         for (let index = 0; index < itemBelongsTo.length; index++) {
             let item_belongsto_relation = itemBelongsTo[index];
             if (_.has(item_orig, item_belongsto_relation.as)) {
-                itemBelongsTo[index]['item'] = await module.exports.AutoImportItem(Models[item_belongsto_relation.model], item_orig[item_belongsto_relation.as], Models).catch(err => { throw err });
+                itemBelongsTo[index]['item'] = await module.exports.AutoImportItem(Models[item_belongsto_relation.model], item_orig[item_belongsto_relation.as], Models, undefined, undefined, transaction).catch(err => { throw err });
                 item[item_belongsto_relation.foreignKey] = itemBelongsTo[index]['item'][model.autoIncrementAttribute];
                 if (!$vnatk_find_options.modeloptions || $vnatk_find_options.modeloptions[item_belongsto_relation.foreignKey] !== false)
                     AdditionalWhere[item_belongsto_relation.foreignKey] = item[item_belongsto_relation.foreignKey];
@@ -432,27 +432,27 @@ module.exports = {
 
         switch ($vnatk_data_handle.toLowerCase()) {
             case 'alwayscreate':
-                item = await model.create(item, { logging: console.log }).catch(err => {
+                item = await model.create(item, { transaction }).catch(err => {
                     throw err
                 });
                 break;
             case 'findorcreate':
-                t = await model.findOne({ where: senitizedmodeloptions }).catch(err => {
+                t = await model.findOne({ where: senitizedmodeloptions, transaction }).catch(err => {
                     throw err
                 });
                 if (!t) {
-                    t = await model.create(item, { logging: console.log }).catch(err => {
+                    t = await model.create(item, { transaction }).catch(err => {
                         throw err
                     });
                 }
                 item = t;
                 break;
             case 'findandupdateorcreate':
-                t = await model.findOne({ where: senitizedmodeloptions }).catch(err => {
+                t = await model.findOne({ where: senitizedmodeloptions, transaction }).catch(err => {
                     throw err
                 });
                 if (!t) {
-                    t = await model.create(item, { logging: console.log }).catch(err => {
+                    t = await model.create(item, { transaction }).catch(err => {
                         throw err
                     });
                 } else {
@@ -470,18 +470,18 @@ module.exports = {
                 item = t;
                 break;
             case 'findtoassociate':
-                t = await model.findOne({ where: senitizedmodeloptions }).catch(err => {
+                t = await model.findOne({ where: senitizedmodeloptions, transaction }).catch(err => {
                     throw err
                 });
                 if (t)
                     item = t;
                 else {
-                    console.log('findtoassociate where condition ', { where: senitizedmodeloptions });
+                    // console.log('findtoassociate where condition ', { where: senitizedmodeloptions });
                     throw new Error(JSON.stringify(item) + ' not found');
                 }
                 break;
             case 'associateiffound':
-                t = await model.findOne({ where: senitizedmodeloptions }).catch(err => {
+                t = await model.findOne({ where: senitizedmodeloptions, transaction }).catch(err => {
                     throw err
                 });
                 if (t)
@@ -503,7 +503,7 @@ module.exports = {
                     // if (thisitemdetails.$vnatk_find_options && thisitemdetails.$vnatk_find_options.modeloptions && thisitemdetails.$vnatk_find_options.modeloptions[thisbelongstomanyrelation.foreignKey] === false) {
                     //     let AddWhere = {};
                     // }
-                    await module.exports.AutoImportItem(Models[thishasmanyrelation.model], thisitemdetails, Models, AddWhere).catch(err => { throw err })
+                    await module.exports.AutoImportItem(Models[thishasmanyrelation.model], thisitemdetails, Models, AddWhere, undefined, transaction).catch(err => { throw err })
                 }
                 delete item[thishasmanyrelation.as];
             }

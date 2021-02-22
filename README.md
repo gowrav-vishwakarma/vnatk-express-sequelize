@@ -1,5 +1,7 @@
-## ALPHA/BETA - Under heavy development and not for production use
+### Beta Release
 ---
+
+[Official VES Documentation](https://gowrav-vishwakarma.github.io/vnatk-express-sequelize/)
 
 Master-branch: ![Vnatk-tests](https://github.com/gowrav-vishwakarma/vnatk-express-sequelize/workflows/Vnatk-tests/badge.svg?branch=master) Develop-branch: ![Vnatk-tests](https://github.com/gowrav-vishwakarma/vnatk-express-sequelize/workflows/Vnatk-tests/badge.svg?branch=develop)
 
