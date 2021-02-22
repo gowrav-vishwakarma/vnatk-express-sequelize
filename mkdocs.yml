@@ -1,0 +1,12 @@
+site_name: VNATK-EXPRESS-SEQUELIZE
+repo_url: https://github.com/gowrav-vishwakarma/vnatk-express-sequelize/
+site_author: "Gowrav Vishwakarma"
+site_dir: 'docssite'
+theme: readthedocs
+nav:
+    - Overview: index.md
+    - QuickStart: quickstart.md
+    - APIs: 
+      - "/crud": crud.md
+      - "/executeaction": executeaction.md
+    # - Examples: examples.md 

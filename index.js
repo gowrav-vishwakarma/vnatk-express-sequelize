@@ -100,6 +100,11 @@ module.exports = function (options) {
         const item = req.body.arg_item;
 
         var model = Models[req.body.model];
+        if (req.body.modelscope !== undefined) {
+            if (req.body.modelscope == false) model = model.unscoped();
+            if (typeof req.body.modelscope === 'string') model.scope(req.body.modelscope);
+        }
+
         if (req.body.read && req.body.read.modelscope !== undefined) {
             if (req.body.read.modelscope == false) model = model.unscoped();
             if (typeof req.body.read.modelscope === 'string') model.scope(req.body.read.modelscope);
@@ -109,7 +114,7 @@ module.exports = function (options) {
             VNATKServerHelpers.getHeadersAndDeRef(model, req, Models);
         }
 
-        var senitizedmodeloptions;
+        var senitizedmodeloptions = {};
         if (req.body.read) {
             senitizedmodeloptions = VNATKServerHelpers.senitizeModelOptions(req.body.read.modeloptions, model, Models);
         }
@@ -170,6 +175,12 @@ module.exports = function (options) {
             res.send({ message: 'Record deleted' });
             return;
         } else if (action.name == 'vnatk_autoimport') {
+            if (_.has(model, 'can_vnatk_autoimport') || _.has(model.__proto__, 'can_vnatk_autoimport')) {
+                if (model.can_vnatk_autoimport(req) !== true) {
+                    res.status(500).send({ error: true, Message: 'AutoImporting on model ' + req.body.model + ' is not allowed by authorization functions' });
+                    return;
+                }
+            }
             var response = await VNATKServerHelpers.vnatkAutoImport(model, req.body, Models).catch(err => { throw err });
             res.send({ message: 'Import done', response: response });
             return
