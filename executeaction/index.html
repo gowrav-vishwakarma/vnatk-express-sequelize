@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="Gowrav Vishwakarma">
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>/executeaction - VNATK-EXPRESS-SEQUELIZE</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "/executeaction";
+    var mkdocs_page_input_path = "executeaction.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> VNATK-EXPRESS-SEQUELIZE</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                    </li>
+                </ul>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../quickstart/">QuickStart</a>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">APIs</span></p>
+                <ul class="current">
+                    <li class="toctree-l1"><a class="reference internal" href="../crud/">/crud</a>
+                    </li>
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">/executeaction</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#api-options">API Options</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#pre-defined-actions">Pre defined actions</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#vnatk_add">vnatk_add</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#vnatk_edit">vnatk_edit</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#vnatk_delete">vnatk_delete</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#vnatk_autoimport">vnatk_autoimport</a>
+        <ul>
+    <li class="toctree-l4"><a class="reference internal" href="#vnatk_import-example">vnatk_import example</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#user-defined-methods">User defined methods</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#safety-and-security">Safety and Security</a>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">VNATK-EXPRESS-SEQUELIZE</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+        
+          <li>APIs &raquo;</li>
+        
+      
+    
+    <li>/executeaction</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/gowrav-vishwakarma/vnatk-express-sequelize/edit/master/docs/executeaction.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="base_pathexecuteaction"><code>{base_path}/executeaction</code></h1>
+<hr />
+<h2 id="api-options">API Options</h2>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>model</td>
+<td><code>String</code></td>
+<td><code>null</code></td>
+<td>Model name to work on, [Mendatory]</td>
+</tr>
+<tr>
+<td>read</td>
+<td><code>JSON</code></td>
+<td>{}</td>
+<td>options for model to be used to apply action on, [Optional]</td>
+</tr>
+<tr>
+<td>read.modeloptions</td>
+<td><code>JSON</code></td>
+<td></td>
+<td>Options to pass to your model define above</td>
+</tr>
+<tr>
+<td>read.modelscope</td>
+<td><code>String</code>|<code>false</code></td>
+<td></td>
+<td><code>false</code> to use unscoped model and avoid any default scope applied on model, or use define scope to use as string</td>
+</tr>
+<tr>
+<td>action_to_execute</td>
+<td><code>String</code></td>
+<td><code>null</code></td>
+<td>Action to perform on defined model <br/> supported default actions are  <br/> - <code>vnatk_add</code>: pass arg_item data to create a new record of given model. <br/> - <code>vnatk_edit</code>: pass arg_item data to edit model record, arg_item must have primary/autoincrement value availabe, model will be loaded by that value and all other values passed will be updated on model. <br/> - <code>vnatk_delete</code>: pass arg_item data to delete model record, arg_item must have primary/autoincrement value availabe, model will be loaded by that value and then destroys. <br/> - <code>{Any User Defined Method Name}</code>: pass arg_item data to your method defined in Model class/declatation. <p>Actions retuns data of added/edited/deleted item, but in any case modeloptions contains some condition that is changed due to editing, <code>null</code> is returned instead</p></td>
+</tr>
+<tr>
+<td>arg_item</td>
+<td><code>JSON</code></td>
+<td><code>null</code></td>
+<td>Argument passed for your action, for <code>vnatk_edit</code> and <code>vnatk_delete</code> actions, arg_item must have id or your primary key value to pick correct record, while for <code>vnatk_add</code> action data passed will be used to create fill in <code>model.create</code>.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="pre-defined-actions">Pre defined actions</h2>
+<h3 id="vnatk_add">vnatk_add</h3>
+<p>Create single record of any model in flat manner (To create deep relational records please see <code>vnatk_autoimport</code>)</p>
+<pre><code class="language-javascript">
+let createRecordOption = {
+  model: 'User',
+  modelscope: false, // After create re-load record unscoped
+  action_to_execute: {execute: 'vnatk_add', name: 'vnatk_add'},
+  arg_item: {
+      name : 'Foo',
+      bar: 'Bar'
+  },
+}
+
+// Calling by axios
+service.post('/vnatk/executeaction',crudOptions).then(response=&gt;{
+    // newly created record loaded with default modelscope if modelscope is not set to false.
+})
+</code></pre>
+<h3 id="vnatk_edit">vnatk_edit</h3>
+<p>Edit any record by sending data along with id field value. this action updates flat record of any model, to update nested related complex condition based data, please see <code>vnatk_autoimport</code>.</p>
+<pre><code class="language-javascript">
+let createRecordOption = {
+  model: 'User',
+  modelscope: false, // After update re-load record unscoped
+  action_to_execute: {execute: 'vnatk_edit', name: 'vnatk_edit'},
+
+  arg_item: {
+      id: 1
+      name : 'Foo',
+      bar: 'Bar'
+  },
+}
+
+// Calling by axios
+service.post('/vnatk/executeaction',crudOptions).then(response=&gt;{
+    // newly created record loaded with default modelscope if modelscope is not set to false.
+})
+</code></pre>
+<h3 id="vnatk_delete">vnatk_delete</h3>
+<p>Delete any record by sending model and its id field value. </p>
+<p>Do not worry about misuse of the APIs, you have full controll over who can actually execute these apis. Please visit <code>safety and security</code> section.</p>
+<pre><code class="language-javascript">
+let createRecordOption = {
+  model: 'User',
+  modelscope: false, // After update re-load record unscoped
+  action_to_execute: {execute: 'vnatk_delete', name: 'vnatk_delete'},
+  arg_item: {
+      id: 1
+  },
+}
+
+// Calling by axios
+service.post('/vnatk/executeaction',crudOptions).then(response=&gt;{
+    // sends success message on complete
+})
+</code></pre>
+<h3 id="vnatk_autoimport">vnatk_autoimport</h3>
+<p>The most interesting action that actually can replace <code>vnatk_add</code> and <code>vnatk_edit</code> both in one go with more control over what you want to do.</p>
+<p>As the name suggests, this action can import multiple records in one go, including nested deep relational structured json data.</p>
+<p>The strcuture of API payload is as follows</p>
+<pre><code class="language-javascript">{
+    action_to_execute: { execute: 'vnatk_autoimport', name: 'vnatk_autoimport' },
+    importdata: importdata, // Array of objects, each object represents one record, flat or nested
+    model: String, // model name to start import into
+    transaction: String // (&quot;row&quot; or &quot;file&quot;), to make transaction all record based or one transaction per recrod
+}
+</code></pre>
+<p>here importdata object is JSON data with following special properties to define action for data</p>
+<ul>
+<li>
+<p><code>$vnatk_data_handle</code>: How you want to handle specific record, you can use the option nested for each nested data also.
+Possible values are </p>
+<ul>
+<li><code>alwaysCreate</code> [default]: Record is always inserted</li>
+<li><code>findOrCreate</code>: Find by matching all values that are passed or by using <code>$vnatk_find_options</code> if defined to find, if not found, create a new record.</li>
+<li><code>findAndUpdateOrCreate</code>: Find by matching all values that are passed or by using <code>$vnatk_find_options</code> if defined to find and then update changed values passed in object (field:value), if not found, create a new record.</li>
+<li><code>findToAssociate</code>: For nested records, try find existing record, if found use its relational key to associate with parent record or produce error if not found.</li>
+<li><code>associateIfFound</code>: For nested records, try find existing record, if found use its relational key to associate with parent record or ignore if not found</li>
+</ul>
+</li>
+<li>
+<p><code>$vnatk_find_options</code>: Use this as where condition in sequelize models to find if vnatk_data_handle is to find record first</p>
+</li>
+<li><code>$vnatk_cache_records</code>: Under development: To cache any record if already found, to avoid multiple database queires.</li>
+<li><code>$vnatk_update_data</code>: Under development: update values defined here instead all values passed to create if not found.</li>
+</ul>
+<h4 id="vnatk_import-example">vnatk_import example</h4>
+<p>Lets consider a data structure first, and then import/add/edit data based on VES <code>executeaction</code> api on <code>vnatk_autoimpot</code> action.</p>
+<pre><code class="language-javascript">//Gorup.js model
+module.exports = (sequelize, DataTypes) =&gt; {
+    const Group = sequelize.define('Group', {
+        name: DataTypes.STRING,
+    }, {});
+    Group.associate = function (models) {
+        Group.hasMany(models.User, {
+            foreignKey: 'groupId',
+            as: 'GroupUsers'
+        })
+    };
+    return Group;
+};
+
+// User.js
+module.exports = (sequelize, DataTypes) =&gt; {
+    const User = sequelize.define('User', {
+        firstName: DataTypes.STRING,
+        lastName: DataTypes.STRING,
+        email: DataTypes.STRING,
+        password: DataTypes.STRING
+    }, {});
+    User.associate = function (models) {
+        // associations can be defined here
+        User.belongsTo(models.Group, {
+            foreignKey: 'groupId',
+            as: 'Group'
+        })
+        User.hasMany(models.Project, {
+            foreignKey: 'adminId',
+            as: 'ProjectsOwned'
+        })
+        User.belongsToMany(models.Project, {
+            foreignKey: 'adminId',
+            as: 'Projects',
+            through: models.UserProjects
+        })
+    };
+    return User;
+};
+
+// Skill.js
+module.exports = (sequelize, DataTypes) =&gt; {
+    const Skill = sequelize.define('Skill', {
+        name: DataTypes.STRING,
+    }, {});
+    Skill.associate = function (models) {
+        // associations can be defined here
+        Skill.belongsTo(models.User, {
+            foreignKey: 'userId',
+            as: 'SkillOwner'
+        })
+    };
+    return Skill;
+};
+
+// Project.js
+module.exports = (sequelize, DataTypes) =&gt; {
+    const Project = sequelize.define('Project', {
+        title: DataTypes.STRING,
+        imageUrl: DataTypes.STRING,
+        description: DataTypes.TEXT,
+        adminId: DataTypes.INTEGER
+    }, {});
+    Project.associate = function (models) {
+        Project.belongsTo(models.User, {
+            foreignKey: 'adminId',
+            onDelete: 'CASCADE',
+            as: 'ProjectAdmin'
+        })
+        Project.belongsToMany(models.User, {
+            foreignKey: 'adminId',
+            onDelete: 'CASCADE',
+            as: 'ProjectUsers',
+            through: models.UserProjects
+        })
+    };
+    return Project;
+};
+
+// UserProjects.js
+module.exports = (sequelize, DataTypes) =&gt; {
+    const UserProjects = sequelize.define('UserProjects', {
+        assignedOn: DataTypes.DATE,
+        remarks: DataTypes.STRING,
+        isDone: DataTypes.BOOLEAN,
+    }, {});
+    UserProjects.associate = function (models) {
+        UserProjects.belongsTo(models.Project, {
+            foreignKey: 'projectId'
+        });
+
+        UserProjects.belongsTo(models.User, {
+            foreignKey: 'userId'
+        });
+
+        UserProjects.hasMany(models.UserProjectRemarks, {
+            foreignKey: 'userProjectId'
+        });
+
+    };
+    return UserProjects;
+};
+
+// UserProjectRemarks.js
+module.exports = (sequelize, DataTypes) =&gt; {
+    const UserProjectRemarks = sequelize.define('UserProjectRemarks', {
+        remarks: DataTypes.STRING,
+    }, {});
+    UserProjectRemarks.associate = function (models) {
+        UserProjectRemarks.belongsTo(models.UserProjects, {
+            foreignKey: 'userProjectId',
+            as: 'ProjectRemarks'
+        })
+    };
+    return UserProjectRemarks;
+};
+
+</code></pre>
+<p>Quite a complex structure to start with, but the power of VES only comes to proper view with such an example.</p>
+<p>Lets create/import a record for this strcuture with following JSON payload. read comments to understand each line well.</p>
+<pre><code class="language-javascript">
+let CreateOrImport = {
+    model: 'User',
+    modelscope: false, // After update re-load record unscoped
+    action_to_execute: {execute: 'vnatk_autoimport', name: 'vnatk_autoimport'},
+    transaction: 'file',
+    importdata: [{
+        $vnatk_data_handle = &quot;findOrCreate&quot;; // find as per below vnatk_find_options, if not found create by field values
+        $vnatk_find_options: {
+            modeloptions:{
+                email: 'foo@bar.com'
+            },
+            modelacope: false // to avoid any default acope in case
+        },
+        firstName: 'UserFirstName',
+        lastName: 'UserLastName',
+        email: 'foo@bar.com',
+        password: 'anyPassword'
+
+        // This User belongs to a Group that we also want to findOrCreate
+        // Belongs to are defined as Object, Once found/created Group id will be associated with User as well
+        Group: {
+            $vnatk_data_handle = &quot;findOrCreate&quot;; // find as per below vnatk_find_options, if not found create by field values
+            $vnatk_find_options:{
+                modeloptions: {
+                    name: 'MyFirstGroup'
+                },
+                modelscope: false // To use unscoped model (in case defaultscope is set to active only)
+            },
+            name: 'MyFirstGroup'
+        }
+
+        // Lets add some hasMany records for this User
+        // has Many records are always passed as Array of Objects
+        Skills: [
+            {
+                name: 'skill_1',
+                $vnatk_data_handle: &quot;findOrCreate&quot;, // Since no $vnatk_find_options is passed all fields (here is only one) will be used to find record
+            }
+            {
+                name: 'skill_2',
+                $vnatk_data_handle: &quot;findOrCreate&quot;, // Since no $vnatk_find_options is passed all fields (here is only one) will be used to find record
+            }
+        ]
+
+        // User has two relations with Projects, as HasMany ProjectsOwned and belongsToMany as Projects
+        // lets define HasMany data first.
+        // following key must match 'as' prperty defined in sequleize model relation.
+        ProjectsOwned: [
+            {
+                title: 'Project Title 1',
+                description: 'Project Description',
+                code: 'PRJ1',
+                $vnatk_data_handle: &quot;findAndUpdateOrCreate&quot;, // if found, update admin Id to this user id
+                $vnatk_find_options: {
+                    modeloptions: {
+                        code: 'PRJ1',
+                    },
+                    modelscope: false,
+                },
+            },
+            {
+                title: 'Project Title 2',
+                description: 'Project Description 2',
+                code: 'PRJ2',
+                $vnatk_data_handle: &quot;findAndUpdateOrCreate&quot;, // if found, update admin Id to this user id
+                $vnatk_find_options: {
+                    modeloptions: {
+                        code: 'PRJ2',
+                    },
+                    modelscope: false,
+                },
+            }
+
+            // User belongs To many Projects with Through relation, lets create them as well
+            // belongs to are also defined as Array of Objects, where object denotes through table and that consists of belongsTo record entry, User id will be inserted automatically by VES
+            // following key must match 'as' prperty defined in sequleize model relation.
+
+            Projects: [
+                {
+                    $vnatk_data_handle: &quot;findOrCreate&quot;, // find will be based on relational keys here
+                    assignedOn: &quot;1970-01-01&quot;, // fields in through table
+                    isDone: false, // field in through table
+                    Project: {
+                        // through model belongsTo Project is defined here
+                        title: 'Project title 1',
+                        $vnatk_data_handle: &quot;findOrCreate&quot;,
+                        $vnatk_find_options: {
+                            modeloptions: {
+                                code: 'PRJ1',
+                            },
+                        },
+                    },
+                    // Projects many to many relation also contains hasMany relation of remarks
+                    UserProjectRemarks:[
+                        {
+                            // Since no $vnatk_data_handle is defined it is assumed to be alwaysCreated
+                             remarks: 'Remark one',
+                        },
+                        {
+                            // Since no $vnatk_data_handle is defined it is assumed to be alwaysCreated
+                             remarks: 'Remark two',
+                        }
+                    ]
+                },
+                {
+                    $vnatk_data_handle: &quot;findOrCreate&quot;, // find will be based on relational keys here
+                    assignedOn: &quot;1970-01-01&quot;, // fields in through table
+                    isDone: true, // field in through table
+                    Project: {
+                        // through model belongsTo Project is defined here
+                        title: 'Project Title 3',
+                        $vnatk_data_handle: &quot;findOrCreate&quot;,
+                        $vnatk_find_options: {
+                            modeloptions: {
+                                code: 'PRJ3',
+                            },
+                        },
+                    },
+
+                    UserProjectRemarks:[
+                        {
+                            remarks: 'remark 3'
+                        }
+                    ]
+                }
+            ]
+        ]
+    }],
+}
+
+// Calling by axios
+service.post('/vnatk/executeaction',crudOptions).then(response=&gt;{
+    // response contains information about your import data
+})
+</code></pre>
+<p>Since <code>importdata</code> is an array, you can send multiple records each with nested data to have your records created or imported as well. <code>vnatk-vue</code>, allows you to convert csv/excel flat data to convert in this nested way by <code>rowformatter</code> option in <code>import</code> and then the same action is executed. </p>
+<h3 id="user-defined-methods">User defined methods</h3>
+<p>In case you want to execute any other method in your model you can simple change your action_to_execute.execute property to method name and arg_item will be passed to the method of your model</p>
+<pre><code class="language-javascript">
+// Considering your model do have a method named sendEmail accepting some parameter as object.
+
+let createRecordOption = {
+  model: 'User',
+  modelscope: false, // After update re-load record unscoped
+  action_to_execute: {execute: 'sendEmail'},
+  arg_item: { // this object will be passed to your method
+      user_email: 'foo@bar.com'
+  },
+}
+
+// Calling by axios
+service.post('/vnatk/executeaction',crudOptions).then(response=&gt;{
+    // sends success message on complete
+})
+</code></pre>
+<h2 id="safety-and-security">Safety and Security</h2>
+<p>vnatk-express-sequelize, while provide you endpoints to do almost anything without writing code, also provides you three levels of access controls (more are under development)
+- By providing access token checker middelware</p>
+<pre><code class="language-javascript">var express = require('express');
+var router = express.Router();
+const vnatk = require('vnatk-express-sequelize');
+
+// THIS LINE TO USE AUTHENTICATION CHECKER
+router.use(require('./middleware/adminTokenChecker'));
+
+const Models = require('../../models');
+module.exports = vnatk({ 
+    Models: Models,
+    router: router
+});
+
+</code></pre>
+<ul>
+<li>Providing whiteList/Blacklist models</li>
+</ul>
+<p>Example: in your vnatk routes file plass options as follows</p>
+<pre><code class="language-javascript">var express = require('express');
+var router = express.Router();
+const vnatk = require('vnatk-express-sequelize');
+
+router.use(require('./middleware/adminTokenChecker'));
+
+const Models = require('../../models');
+module.exports = vnatk({ 
+    Models: Models,
+    router: router,
+    // allow only following models
+    whitelistmodels:['Products','Cart'],
+    // do not allow following models
+    blacklistmodels:['Orders','Payments']
+});
+
+</code></pre>
+<ul>
+<li>Providing each actions authorization function in model itself</li>
+</ul>
+<p>Example</p>
+<p>Each action checks for <code>can_{action}</code> function in model, if found, the function is called <code>by passing request object</code>. on receiving <code>===</code> true only then the related action is executed.</p>
+<p>four default actions for basic VES options are <code>vnatk_add</code>, <code>vnatk_edit</code>,  <code>vnatk_delete</code> and <code>vnatk_autoimport</code>. To make authorization related to these actions you may created <code>can_vnatk_add</code>, <code>can_vnatk_edit</code>, <code>can_vnatk_delete</code> and <code>can_vnatk_autoimport</code> function in models respectiley.</p>
+<p>Under development:
+Authorization and ACL based on each Model or record is under development</p>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../crud/" class="btn btn-neutral" title="/crud"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/gowrav-vishwakarma/vnatk-express-sequelize/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href="../crud/" style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>

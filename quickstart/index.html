@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <meta name="author" content="Gowrav Vishwakarma">
+  
+  <link rel="shortcut icon" href="../img/favicon.ico">
+  <title>QuickStart - VNATK-EXPRESS-SEQUELIZE</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="../css/theme.css" />
+  <link rel="stylesheet" href="../css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "QuickStart";
+    var mkdocs_page_input_path = "quickstart.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="../js/jquery-2.1.1.min.js" defer></script>
+  <script src="../js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href=".." class="icon icon-home"> VNATK-EXPRESS-SEQUELIZE</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="..">Overview</a>
+                    </li>
+                </ul>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">QuickStart</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a>
+        <ul>
+    <li class="toctree-l3"><a class="reference internal" href="#step-10-setup-express-app">Step 1.0: setup express app</a>
+    </li>
+    <li class="toctree-l3"><a class="reference internal" href="#step-20-configure-and-add-route-for-vnatk-express-sequelize">Step 2.0: configure and add route for vnatk-express-sequelize</a>
+    </li>
+        </ul>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#use-apis">Use APIs</a>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+                <p class="caption"><span class="caption-text">APIs</span></p>
+                <ul>
+                    <li class="toctree-l1"><a class="reference internal" href="../crud/">/crud</a>
+                    </li>
+                    <li class="toctree-l1"><a class="reference internal" href="../executeaction/">/executeaction</a>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href="..">VNATK-EXPRESS-SEQUELIZE</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href="..">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>QuickStart</li>
+    <li class="wy-breadcrumbs-aside">
+      
+        <a href="https://github.com/gowrav-vishwakarma/vnatk-express-sequelize/edit/master/docs/quickstart.md"
+          class="icon icon-github"> Edit on GitHub</a>
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h1 id="quickstart">QuickStart</h1>
+<h2 id="installation">Installation</h2>
+<p>VES can be installed in your existing express-sequelize project as well.</p>
+<h3 id="step-10-setup-express-app">Step 1.0: setup express app</h3>
+<p>the below example shows to setup a complete new project from scratch, but if you have all set you just need to do <code>npm install --save vnatk-express-sequelize</code></p>
+<p>Considering we are in "Your Project Root Folder"</p>
+<p>lets create express app (Server/service) from scratch, you are welcome to use any other way or manual if you know what you are doing</p>
+<pre><code class="language-bash">### FOR NEW SERVICE SETUP
+
+#install express-generator globally, its easy to do setup with this
+$yourProjectRoot&gt; npm install -g express-generator
+...
+$yourProjectRoot&gt; express server --no-view
+...
+#lets check if a folder with server name created or not
+$yourProjectRoot&gt; ls
+server
+
+#a default structure is also created in this folder
+$yourProjectRoot&gt; ls server
+app.js       package.json routes    bin          public
+
+$yourProjectRoot&gt; cd server
+
+#lets install basic things setup by express-generator
+$yourProjectRoot/server&gt; npm install
+
+#install our dependencies now
+$yourProjectRoot/server&gt; npm install --save bcrypt body-parser cookie-parser express-handlebars jsonwebtoken morgan cors dotenv lodash mysql2 sequelize vnatk-express-sequelize
+
+### If required vnatk-express-sequelize can be installed in existing express seuelize setup also with very ease
+
+#install sequelize cli for easy sequlize setup
+$yourProjectRoot/server&gt; npm install --save-dev sequelize-cli
+$yourProjectRoot/server&gt; sequelize init
+
+</code></pre>
+<h3 id="step-20-configure-and-add-route-for-vnatk-express-sequelize">Step 2.0: configure and add route for vnatk-express-sequelize</h3>
+<p>Please add the following code in your <code>app.js</code> file.</p>
+<p>(DON'T COPY PASTE WHOLE CODE, ITS NOT FULL FILE CODE) </p>
+<p><code>app.js</code></p>
+<pre><code class="language-javascript">// somewhere on the top after 
+// var express = require('express'); &lt;= after this line
+var cors = require('cors');
+const bodyParser = require('body-parser');
+const vnatk = require('vnatk-express-sequelize');
+...
+...
+// You can already have body-parser added, no need to add again
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: true }));
+
+// add cors is a good way and mostly you might need this also
+app.use(cors()); // Use this after the variable declaration
+
+var VnatkRouter = require('./routes/vnatk.js');
+app.use('/vnatk', VnatkRouter); // '/vnatk' is called basepath here
+
+</code></pre>
+<p>Now create a new file to export Vnatk Routes
+<code>routes/vnatk.js</code></p>
+<pre><code class="language-javascript">var express = require('express');
+var router = express.Router();
+const vnatk = require('vnatk-express-sequelize');
+
+// Optional to use some auth middleware on this route
+//router.use(require('./middleware/adminTokenChecker'));
+
+const Models = require('../../models');
+module.exports = vnatk({ 
+    Models: Models,
+    router: router
+});
+
+</code></pre>
+<h2 id="use-apis">Use APIs</h2>
+<p>The above setup addes a couple of APIs on defined basepath as follows</p>
+<p>vnatk-express-sequlize provides two APIs</p>
+<ul>
+<li>
+<p><code>{base_path}/crud (POST)</code>
+This API is used to read data, DON'T GET CONFUSED with CRUD Name, this API DO NOT Create., Update or Delete. Instead, the API do provide infromation about Create, Update, Delete and Actions to work in combination with VNATK-VUE Fronetnd.</p>
+</li>
+<li>
+<p><code>{base_path}/executeaction (POST)</code>
+This API is responsible for various actions includeing Create, Update, Delete and Other Methods on Models including autoimport.</p>
+</li>
+</ul>
+              
+            </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../crud/" class="btn btn-neutral float-right" title="/crud">Next <span class="icon icon-circle-arrow-right"></span></a>
+      
+      
+        <a href=".." class="btn btn-neutral" title="Overview"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+          <a href="https://github.com/gowrav-vishwakarma/vnatk-express-sequelize/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
+      
+      
+        <span><a href=".." style="color: #fcfcfc;">&laquo; Previous</a></span>
+      
+      
+        <span style="margin-left: 15px"><a href="../crud/" style="color: #fcfcfc">Next &raquo;</a></span>
+      
+    </span>
+</div>
+    <script>var base_url = '..';</script>
+    <script src="../js/theme.js" defer></script>
+      <script src="../search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
