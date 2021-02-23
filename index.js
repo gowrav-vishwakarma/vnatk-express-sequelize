@@ -25,6 +25,8 @@ module.exports = function (options) {
     router.post('/crud', async function (req, res, next) {
         var model = Models[req.body.model];
 
+        const skipIdInsert = req.body.actions !== undefined && req.body.actions === false;
+
         if (
             (_.has(options, 'whitelistmodels') && !options.whitelistmodels.includes(req.body.model))
             || (_.has(options, 'blacklistmodels') && options.blacklistmodels.includes(req.body.model))
@@ -49,7 +51,7 @@ module.exports = function (options) {
         var ModelActions = [];
         var returnData = {};
         if (req.body.read && req.body.read.headers) {
-            var ModelHeaders = VNATKServerHelpers.getHeadersAndDeRef(model, req, Models);
+            var ModelHeaders = VNATKServerHelpers.getHeadersAndDeRef(model, req, Models, skipIdInsert);
             if (req.body.actions) ModelHeaders = [...ModelHeaders, VNATKServerHelpers.injectActionColumn()];
         }
 
@@ -64,7 +66,7 @@ module.exports = function (options) {
 
         var data;
         if (req.body.read.data !== false) {
-            var senitizedmodeloptions = VNATKServerHelpers.senitizeModelOptions(req.body.read.modeloptions, model, Models);
+            var senitizedmodeloptions = VNATKServerHelpers.senitizeModelOptions(req.body.read.modeloptions, model, Models, skipIdInsert);
             // console.log('senitizedmodeloptions', senitizedmodeloptions);
             // Paginate data
             if (req.body.read.serversidepagination) {
@@ -97,6 +99,7 @@ module.exports = function (options) {
 
     router.post('/executeaction', async function (req, res, next) {
         const action = req.body.action_to_execute;
+        if (typeof action === 'string' || action instanceof String) action = { name: action, execute: action }
         const item = req.body.arg_item;
 
         var model = Models[req.body.model];
@@ -181,7 +184,11 @@ module.exports = function (options) {
                     return;
                 }
             }
-            var response = await VNATKServerHelpers.vnatkAutoImport(model, req.body, Models).catch(err => { throw err });
+            var response = await VNATKServerHelpers.vnatkAutoImport(model, req.body, Models)
+                .catch(error => {
+                    res.status(VNATKServerHelpers.getErrorCode(error));
+                    return next(error);
+                });
             res.send({ message: 'Import done', response: response });
             return
         } else {
