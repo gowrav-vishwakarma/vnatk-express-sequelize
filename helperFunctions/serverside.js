@@ -135,8 +135,8 @@ module.exports = {
             for (let index = 0; index < obj.length; index++) {
                 const element = obj[index];
                 module.exports.replaceIncludeToObject(element, Models);
-                if (typeof element == 'object' && _.has(element, 'fn')) {
-                    obj[index] = [Models.sequelize.fn(element.fn, element.col), element.as];
+                if (typeof element == 'object' && _.has(element, 'fn') && _.has(element, 'col')) {
+                    obj[index] = [Models.sequelize.fn(element.fn, Models.sequelize.col(element.col)), element.as ? element.as : element.fn + '_' + element.col];
                 }
             }
         } else if (typeof (obj) === 'object') {
