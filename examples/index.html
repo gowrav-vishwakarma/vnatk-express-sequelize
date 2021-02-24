@@ -62,6 +62,16 @@
                     <li class="toctree-l1"><a class="reference internal" href="../executeaction/">/executeaction</a>
                     </li>
                 </ul>
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href="./">Examples</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#basic-example">Basic example</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#using-aggregate-functions">Using aggregate functions</a>
+    </li>
+    </ul>
+                    </li>
+                </ul>
       </div>
     </div>
     </nav>
@@ -97,11 +107,85 @@
           <div role="main">
             <div class="section">
               
-                <p>Example</p>
+                <h1 id="learn-by-examples">Learn by examples</h1>
+<p>This file is a good place to learn vnatk by examples</p>
+<p>We are giving you axios examples as the main purpose of this framework is to work with vnatk-vue. But in any case, you should focus on postData and pay attenstion to comments in each example</p>
+<h2 id="basic-example">Basic example</h2>
+<pre><code class="language-javascript">var postData = {
+    model: &quot;SaleOrder&quot;,
+    create: false, // you can skip these false set, but setting this will clear your received data from unwanted things.
+    update: false, // all those extra informations are for vnatk-vue framework
+    delete: false,
+    actions: false, // this must be set to false, as by default vnatk adds id field for various actions.
+    read: {
+        modeloptions: {
+            where: { // where name like '%'+ name_var + '%' or createdAt &gt; given value
+                $or: {
+                    name :{
+                        $like: '%'+ name_var + '%'
+                    },
+                    createdAt: {
+                        $gt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) // last 30 days
+                        .toJSON()
+                        .slice(0, 10), // in mysql yyyy-mm-dd format
+                    }
+                },
+            },
+        },
+    },
+};
+
+axios_instance.post(&quot;/admin/vnatk/crud&quot;, postData).then((response) =&gt; {
+    // returns data from SaleOrder model with default scope applied if any
+    console.log(response.data.data);
+});
+
+
+</code></pre>
+<h2 id="using-aggregate-functions">Using aggregate functions</h2>
+<pre><code class="language-javascript">
+var postData = {
+    model: &quot;SaleOrder&quot;,
+    create: false,
+    update: false,
+    delete: false,
+    actions: false, // this must be set to false, as by default vnatk adds id field for various actions.
+    read: {
+        modeloptions: {
+        attributes: [
+            // converts to sequelize.fn, sequelize.col at the framework backend
+            { fn: &quot;DATE&quot;, col: &quot;createdAt&quot;, as: &quot;Date&quot; },
+            { fn: &quot;sum&quot;, col: &quot;netAmount&quot;, as: &quot;Sales&quot; },
+        ],
+        where: {
+            createdAt: {
+            $gt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) // last 30 days
+                .toJSON()
+                .slice(0, 10), // in mysql yyyy-mm-dd format
+            },
+        },
+        group: [{ fn: &quot;DATE&quot;, col: &quot;createdAt&quot; }],
+        },
+    },
+};
+
+axios_instance.post(&quot;/admin/vnatk/crud&quot;, postData).then((response) =&gt; {
+    console.log(response.data.data);
+});
+
+
+</code></pre>
               
             </div>
           </div>
           <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="../executeaction/" class="btn btn-neutral" title="/executeaction"><span class="icon icon-circle-arrow-left"></span> Previous</a>
+      
+    </div>
   
 
   <hr/>
@@ -126,6 +210,8 @@
       
           <a href="https://github.com/gowrav-vishwakarma/vnatk-express-sequelize/" class="fa fa-github" style="float: left; color: #fcfcfc"> GitHub</a>
       
+      
+        <span><a href="../executeaction/" style="color: #fcfcfc;">&laquo; Previous</a></span>
       
       
     </span>
