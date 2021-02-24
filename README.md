@@ -13,11 +13,11 @@ VNATK is developed to keep the following few points in mind
 - Most of the time we spend time in creating trivial APIs, that actually are identical with different models.
 - we all know how tesdius it is to do maintenance of any project specially when client/company is ever changing their requirements. By looking at those issue I was missing somehting that really is fast, really RAPID APPLICATION DEVELOPMENT (RAD) framework.
 
-VNATK-EXPRESS-SEQULIZE is implementation of Sequlize-QL (Given name as per Graph-QL) that can be used as independent tool to ease your API development.
+VNATK-EXPRESS-SEQUELIZE is implementation of Sequelize-QL (my coined term ;) ) (Given name as per Graph-QL) that can be used as independent tool to ease your API development.
 
-The main purpose though to develop VNATK-EXPRESS-SEQULIZE is to provide API-Less server system for VNATK framework. It works in combination with its counter front part like VUEATK-VUE [https://github.com/gowrav-vishwakarma/vnatk-vue]
+The main purpose though to develop VNATK-EXPRESS-SEQUELIZE is to provide API-Less server system for VNATK framework. It works in combination with its counter front part like VUEATK-VUE [https://github.com/gowrav-vishwakarma/vnatk-vue]
 
-# VNATK-EXPRESS-SEQULIZE (Backend with Express and Squelize)
+# VNATK-EXPRESS-SEQUELIZE (Backend with Express and Squelize)
 ---
 
 Equipped with a few endpoints that gives you all power with Sequalized-QL developed and defined by this project only.
@@ -282,7 +282,7 @@ There are more rich set of options applicable when using with VNATK-VUE. To know
 
 # Safety and Security
 ---
-VNATK-EXPRESS-SEQULIZE, while provide you endpoints to do almost anything without writing code,also provides you three levels of access controls
+VNATK-EXPRESS-SEQUELIZE, while provide you endpoints to do almost anything without writing code,also provides you three levels of access controls
 - By providing access token checker middelware
 
 Example: As given in setup section to use auth middelware

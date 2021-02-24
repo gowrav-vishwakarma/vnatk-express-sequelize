@@ -117,7 +117,7 @@ Possible values are
 
 #### vnatk_import example
 
-Lets consider a data structure first, and then import/add/edit data based on VES `executeaction` api on `vnatk_autoimpot` action.
+Lets consider a data structure first, and then import/add/edit data based on VES `executeaction` api on `vnatk_autoimport` action.
 
 ```javascript
 //Gorup.js model

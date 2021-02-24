@@ -135,8 +135,8 @@ module.exports = {
             for (let index = 0; index < obj.length; index++) {
                 const element = obj[index];
                 module.exports.replaceIncludeToObject(element, Models);
-                if (typeof element == 'object' && _.has(element, 'fn')) {
-                    obj[index] = [Models.sequelize.fn(element.fn, element.col), element.as];
+                if (typeof element == 'object' && _.has(element, 'fn') && _.has(element, 'col')) {
+                    obj[index] = [Models.sequelize.fn(element.fn, Models.sequelize.col(element.col)), element.as ? element.as : element.fn + '_' + element.col];
                 }
             }
         } else if (typeof (obj) === 'object') {
@@ -164,8 +164,8 @@ module.exports = {
         }
     },
 
-    senitizeModelOptions(options, model, Models) {
-        if (_.has(options, 'attributes') && !options.attributes.includes(model.autoIncrementAttribute)) {
+    senitizeModelOptions(options, model, Models, skipIdInsert) {
+        if (_.has(options, 'attributes') && !options.attributes.includes(model.autoIncrementAttribute) && !skipIdInsert) {
             options.attributes.push(model.autoIncrementAttribute);
         }
         module.exports.replaceIncludeToObject(options, Models);
@@ -174,7 +174,7 @@ module.exports = {
 
 
 
-    getHeadersAndDeRef: function (model, req, Models) {
+    getHeadersAndDeRef: function (model, req, Models, skipIdInsert) {
         const associations = VNATKClientHelpers.getAssociations(model);
         var fields = undefined;
         if (req.body.read && req.body.read.modeloptions && req.body.read.modeloptions.attributes) fields = req.body.read.modeloptions.attributes;
@@ -185,7 +185,7 @@ module.exports = {
             fields = _.keys(fields_info);
         }
 
-        if (!fields.includes(model.autoIncrementAttribute)) {
+        if (!fields.includes(model.autoIncrementAttribute) && !skipIdInsert) {
             fields.push(model.autoIncrementAttribute);
         }
 
@@ -193,7 +193,7 @@ module.exports = {
         if (req.body.read && req.body.read.modeloptions && !req.body.read.modeloptions.attributes)
             req.body.read.modeloptions.attributes = fields;
 
-        if (req.body.read && req.body.read.modeloptions && req.body.read.modeloptions.attributes && !req.body.read.modeloptions.attributes.includes(model.autoIncrementAttribute)) {
+        if (req.body.read && req.body.read.modeloptions && req.body.read.modeloptions.attributes && !req.body.read.modeloptions.attributes.includes(model.autoIncrementAttribute) && !skipIdInsert) {
             req.body.read.modeloptions.attributes.push(model.autoIncrementAttribute);
         }
 
@@ -202,7 +202,7 @@ module.exports = {
 
         for (let i = 0; i < fields.length; i++) {
             const fld = fields[i];
-            if (fld == model.autoIncrementAttribute) {
+            if (fld == model.autoIncrementAttribute && !skipIdInsert) {
                 field_headers.push({
                     text: model.autoIncrementAttribute,
                     value: model.autoIncrementAttribute,
@@ -262,9 +262,12 @@ module.exports = {
         delete item[model.autoIncrementAttribute];
         var where_condition = {};
         where_condition[model.autoIncrementAttribute] = id;
-        const updated = await model.update(item, { where: where_condition }).catch(error => {
-            throw error;
-        });
+        var modelFound = await model.findOne({ where: where_condition });
+        if (modelFound) {
+            const updated = await modelFound.update(item).catch(error => {
+                throw error;
+            });
+        }
         readModelOptions.where = where_condition;
         var m_loaded = await model.findOne(readModelOptions);
         return m_loaded;
