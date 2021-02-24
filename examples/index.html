@@ -135,7 +135,7 @@
     },
 };
 
-axios_instance.post(&quot;/admin/vnatk/crud&quot;, postData).then((response) =&gt; {
+axios_instance.post(&quot;{BASE_PATH}/crud&quot;, postData).then((response) =&gt; {
     // returns data from SaleOrder model with default scope applied if any
     console.log(response.data.data);
 });
@@ -169,7 +169,7 @@ var postData = {
     },
 };
 
-axios_instance.post(&quot;/admin/vnatk/crud&quot;, postData).then((response) =&gt; {
+axios_instance.post(&quot;{BASE_PATH}/crud&quot;, postData).then((response) =&gt; {
     console.log(response.data.data);
 });
 
