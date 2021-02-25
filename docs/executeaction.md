@@ -255,7 +255,9 @@ let CreateOrImport = {
         $vnatk_data_handle = "findOrCreate"; // find as per below vnatk_find_options, if not found create by field values
         $vnatk_find_options: {
             modeloptions:{
-                email: 'foo@bar.com'
+                where:{
+                    email: 'foo@bar.com'
+                }
             },
             modelacope: false // to avoid any default acope in case
         },
@@ -270,7 +272,9 @@ let CreateOrImport = {
             $vnatk_data_handle = "findOrCreate"; // find as per below vnatk_find_options, if not found create by field values
             $vnatk_find_options:{
                 modeloptions: {
-                    name: 'MyFirstGroup'
+                    where:{
+                        name: 'MyFirstGroup'
+                    }
                 },
                 modelscope: false // To use unscoped model (in case defaultscope is set to active only)
             },
@@ -301,7 +305,9 @@ let CreateOrImport = {
                 $vnatk_data_handle: "findAndUpdateOrCreate", // if found, update admin Id to this user id
                 $vnatk_find_options: {
                     modeloptions: {
-                        code: 'PRJ1',
+                        where:{
+                            code: 'PRJ1',
+                        }
                     },
                     modelscope: false,
                 },
@@ -313,7 +319,9 @@ let CreateOrImport = {
                 $vnatk_data_handle: "findAndUpdateOrCreate", // if found, update admin Id to this user id
                 $vnatk_find_options: {
                     modeloptions: {
-                        code: 'PRJ2',
+                        where:{
+                            code: 'PRJ2',
+                        }
                     },
                     modelscope: false,
                 },
@@ -334,7 +342,9 @@ let CreateOrImport = {
                         $vnatk_data_handle: "findOrCreate",
                         $vnatk_find_options: {
                             modeloptions: {
-                                code: 'PRJ1',
+                                where:{
+                                    code: 'PRJ1',
+                                }
                             },
                         },
                     },
@@ -360,7 +370,9 @@ let CreateOrImport = {
                         $vnatk_data_handle: "findOrCreate",
                         $vnatk_find_options: {
                             modeloptions: {
-                                code: 'PRJ3',
+                                where:{
+                                    code: 'PRJ3',
+                                }
                             },
                         },
                     },
