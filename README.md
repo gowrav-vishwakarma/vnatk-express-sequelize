@@ -3,6 +3,9 @@
 
 [Official VES Documentation](https://gowrav-vishwakarma.github.io/vnatk-express-sequelize/)
 
+[![Join our Discord server!](https://invidget.switchblade.xyz/Dd5canYQxK)](http://discord.gg/Dd5canYQxK)
+
+
 Master-branch: ![Vnatk-tests](https://github.com/gowrav-vishwakarma/vnatk-express-sequelize/workflows/Vnatk-tests/badge.svg?branch=master) Develop-branch: ![Vnatk-tests](https://github.com/gowrav-vishwakarma/vnatk-express-sequelize/workflows/Vnatk-tests/badge.svg?branch=develop)
 
 # VNATK
