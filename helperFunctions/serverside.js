@@ -264,7 +264,7 @@ module.exports = {
         where_condition[model.autoIncrementAttribute] = id;
         var modelFound = await model.findOne({ where: where_condition });
         if (modelFound) {
-            const updated = await modelFound.update(item).catch(error => {
+            const updated = await model.update(item, { where: where_condition, individualHooks: true }).catch(error => {
                 throw error;
             });
         }

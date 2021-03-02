@@ -115,7 +115,7 @@ Possible values are
 * `$vnatk_cache_records`: Under development: To cache any record if already found, to avoid multiple database queires.
 * `$vnatk_update_data`: Under development: update values defined here instead all values passed to create if not found.
 
-#### vnatk_import example
+#### vnatk_autoimport example
 
 Lets consider a data structure first, and then import/add/edit data based on VES `executeaction` api on `vnatk_autoimport` action.
 
