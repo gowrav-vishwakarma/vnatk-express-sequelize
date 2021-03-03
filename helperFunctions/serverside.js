@@ -424,7 +424,13 @@ module.exports = {
         item = _.pick(item, _.map(model.rawAttributes, 'fieldName'));
         let senitizedmodeloptions = { where: Object.assign({}, item) };
         if ($vnatk_find_options.modeloptions) {
-            senitizedmodeloptions = module.exports.senitizeModelOptions($vnatk_find_options.modeloptions, model, Models);
+            let t_sent_mo = { where: module.exports.senitizeModelOptions($vnatk_find_options.modeloptions, model, Models) };
+            for (const [field, value] of Object.entries(t_sent_mo.where)) {
+                if (value === true && _.has(senitizedmodeloptions.where, field)) {
+                    t_sent_mo.where[field] = senitizedmodeloptions.where[field];
+                }
+            }
+            senitizedmodeloptions = t_sent_mo;
         }
         if (!_.isEmpty(AdditionalWhere)) {
             if (!senitizedmodeloptions.where) senitizedmodeloptions.where = {};
@@ -456,6 +462,12 @@ module.exports = {
                     });
                 }
                 item = t;
+                break;
+            case 'findandupdateall':
+                // TODO
+                break;
+            case 'findanddeleteall':
+                // TODO
                 break;
             case 'findandupdateorcreate':
                 senitizedmodeloptions.transaction = transaction;
@@ -489,7 +501,7 @@ module.exports = {
                     item = t;
                 else {
                     // console.log('findtoassociate where condition ', { where: senitizedmodeloptions });
-                    throw new Error(JSON.stringify(item) + ' not found');
+                    throw new Error(JSON.stringify(senitizedmodeloptions) + ' not found');
                 }
                 break;
             case 'associateiffound':
