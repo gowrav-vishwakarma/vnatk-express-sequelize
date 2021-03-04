@@ -452,7 +452,7 @@ module.exports = {
 
         switch ($vnatk_data_handle.toLowerCase()) {
             case 'alwayscreate':
-                item = await model.create(item, { transaction }).catch(err => {
+                item = await model.create(item, { transaction, individualHooks: true }).catch(err => {
                     throw err
                 });
                 break;
@@ -462,7 +462,7 @@ module.exports = {
                     throw err
                 });
                 if (!t) {
-                    t = await model.create(item, { transaction }).catch(err => {
+                    t = await model.create(item, { transaction, individualHooks: true }).catch(err => {
                         throw err
                     });
                 }
