@@ -369,8 +369,8 @@ module.exports = {
         if (item.$vnatk_update_data) { $vnatk_update_data = item.$vnatk_update_data; delete item.$vnatk_update_data };
         if (item.$vnatk_find_options) { $vnatk_find_options = item.$vnatk_find_options; delete item.$vnatk_find_options };
 
-        if ($vnatk_find_options.modelscope) {
-            if (modelscope === false)
+        if ($vnatk_find_options.modelscope !== undefined) {
+            if ($vnatk_find_options.modelscope === false)
                 model = model.unscoped();
             else
                 model = model.scope($vnatk_find_options.modelscope);
@@ -423,11 +423,14 @@ module.exports = {
         // do the data for this model, received the ids: Clean everything that do not belongs to model fields first
         item = _.pick(item, _.map(model.rawAttributes, 'fieldName'));
         let senitizedmodeloptions = { where: Object.assign({}, item) };
+        let plainCondition = senitizedmodeloptions;
         if ($vnatk_find_options.modeloptions) {
+            plainCondition = { where: $vnatk_find_options.modeloptions };
             let t_sent_mo = { where: module.exports.senitizeModelOptions($vnatk_find_options.modeloptions, model, Models) };
             for (const [field, value] of Object.entries(t_sent_mo.where)) {
                 if (value === true && _.has(senitizedmodeloptions.where, field)) {
                     t_sent_mo.where[field] = senitizedmodeloptions.where[field];
+                    plainCondition.where[field] = senitizedmodeloptions.where[field];
                 }
             }
             senitizedmodeloptions = t_sent_mo;
@@ -435,10 +438,12 @@ module.exports = {
         if (!_.isEmpty(AdditionalWhere)) {
             if (!senitizedmodeloptions.where) senitizedmodeloptions.where = {};
             senitizedmodeloptions.where = Object.assign(senitizedmodeloptions.where, AdditionalWhere);
+            plainCondition.where = Object.assign(plainCondition.where, AdditionalWhere);
 
         }
         if (relation === 'BelongsToMany' && (!$vnatk_find_options.modeloptions || !$vnatk_find_options.modeloptions.where)) {
             senitizedmodeloptions = { where: AdditionalWhere };
+            plainCondition = { where: AdditionalWhere };
         }
 
         // senitizedmodeloptions.transaction = transaction;
@@ -501,7 +506,7 @@ module.exports = {
                     item = t;
                 else {
                     // console.log('findtoassociate where condition ', { where: senitizedmodeloptions });
-                    throw new Error(JSON.stringify(senitizedmodeloptions) + ' not found');
+                    throw new Error(JSON.stringify(plainCondition) + ' not found');
                 }
                 break;
             case 'associateiffound':

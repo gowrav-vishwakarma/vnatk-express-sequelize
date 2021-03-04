@@ -257,6 +257,7 @@ let CreateOrImport = {
             modeloptions:{
                 where:{
                     email: 'foo@bar.com'
+                    // group_id: true // To include belongsTo Group's id in where condition, actual Id will be taken in true's place
                 }
             },
             modelacope: false // to avoid any default acope in case
