@@ -21,6 +21,12 @@ module.exports = function (options) {
 
     const Models = options.Models;
     const router = options.router;
+    const allowRead = options.read !== undefined ? true : options.read;
+    const allowCreate = options.create !== undefined ? true : options.create;
+    const allowUpdate = options.update !== undefined ? true : options.update;
+    const allowDelete = options.delete !== undefined ? true : options.delete;
+    const allowImport = options.import !== undefined ? true : options.import;
+    const allowActions = options.actions !== undefined ? true : options.actions;
 
     router.post('/crud', async function (req, res, next) {
         var model = Models[req.body.model];
@@ -65,7 +71,7 @@ module.exports = function (options) {
         }
 
         var data;
-        if (req.body.read.data !== false) {
+        if (allowRead && req.body.read.data !== false) {
             var senitizedmodeloptions = VNATKServerHelpers.senitizeModelOptions(req.body.read.modeloptions, model, Models, skipIdInsert);
             // console.log('senitizedmodeloptions', senitizedmodeloptions);
             // Paginate data
@@ -91,7 +97,7 @@ module.exports = function (options) {
             returnData['data'] = data;
         }
 
-        if (req.body.read && req.body.read.headers) returnData['headers'] = ModelHeaders;
+        if (allowRead && req.body.read && req.body.read.headers) returnData['headers'] = ModelHeaders;
         if (req.body.actions) returnData['actions'] = ModelActions;
 
         res.send(returnData);
@@ -122,7 +128,7 @@ module.exports = function (options) {
             senitizedmodeloptions = VNATKServerHelpers.senitizeModelOptions(req.body.read.modeloptions, model, Models);
         }
 
-        if (action.name == 'vnatk_add') {
+        if (allowCreate && action.name == 'vnatk_add') {
             if (_.has(model, 'can_vnatk_add') || _.has(model.__proto__, 'can_vnatk_add')) {
                 if (model.can_vnatk_add(req) !== true) {
                     res.status(500).send({ error: true, Message: 'Adding on model ' + req.body.model + ' is not allowed by authorization functions' });
@@ -139,7 +145,7 @@ module.exports = function (options) {
                 return next(error);
             });
         }
-        else if (action.name == 'vnatk_edit') {
+        else if (allowUpdate && action.name == 'vnatk_edit') {
             if (_.has(model, 'can_vnatk_edit') || _.has(model.__proto__, 'can_vnatk_edit')) {
                 if (model.can_vnatk_edit(req) !== true) {
                     res.status(500).send({ error: true, Message: 'Editing on model ' + req.body.model + ' is not allowed by authorization functions' });
@@ -157,7 +163,7 @@ module.exports = function (options) {
             res.send({ row_data: editedData, message: 'Record edited sucessfully' });
             return;
         }
-        else if (action.name == 'vnatk_delete') {
+        else if (allowDelete && action.name == 'vnatk_delete') {
             if (_.has(model, 'can_vnatk_delete') || _.has(model.__proto__, 'can_vnatk_delete')) {
                 if (model.can_vnatk_delete(req) !== true) {
                     res.status(500).send({ error: true, Message: 'Deleting on model ' + req.body.model + ' is not allowed by authorization functions' });
@@ -177,7 +183,7 @@ module.exports = function (options) {
             });
             res.send({ message: 'Record deleted' });
             return;
-        } else if (action.name == 'vnatk_autoimport') {
+        } else if (allowImport && action.name == 'vnatk_autoimport') {
             if (_.has(model, 'can_vnatk_autoimport') || _.has(model.__proto__, 'can_vnatk_autoimport')) {
                 if (model.can_vnatk_autoimport(req) !== true) {
                     res.status(500).send({ error: true, Message: 'AutoImporting on model ' + req.body.model + ' is not allowed by authorization functions' });
@@ -192,7 +198,7 @@ module.exports = function (options) {
             res.send({ message: 'Import done', response: response });
             return
         } else {
-            if (_.has(model, 'can_' + action.execute) || _.has(model.__proto__, 'can_' + action.execute)) {
+            if (!allowActions || _.has(model, 'can_' + action.execute) || _.has(model.__proto__, 'can_' + action.execute)) {
                 if (model['can_' + action.execute](req) !== true) {
                     res.status(500).send({ error: true, Message: 'Executing ' + action.execute + ' on model ' + req.body.model + ' is not allowed by authorization functions' });
                     return;
