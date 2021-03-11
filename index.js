@@ -98,7 +98,7 @@ module.exports = function (options) {
     });
 
     router.post('/executeaction', async function (req, res, next) {
-        const action = req.body.action_to_execute;
+        var action = req.body.action_to_execute;
         if (typeof action === 'string' || action instanceof String) action = { name: action, execute: action }
         const item = req.body.arg_item;
 
