@@ -361,13 +361,14 @@ module.exports = {
         let $vnatk_data_handle = 'alwaysCreate';
         let $vnatk_find_options = {};
         let $vnatk_cache_records = true;
-        let $vnatk_update_data = {};
+        let $vnatk_update_data = item;
 
         if (item.$vnatk_data_handle) { $vnatk_data_handle = item.$vnatk_data_handle; delete item.$vnatk_data_handle };
         if (item.$vnatk_find_options) { $vnatk_find_options = item.$vnatk_find_options; delete item.$vnatk_find_options };
         if (item.$vnatk_cache_records) { $vnatk_cache_records = item.$vnatk_cache_records; delete item.$vnatk_cache_records };
         if (item.$vnatk_update_data) { $vnatk_update_data = item.$vnatk_update_data; delete item.$vnatk_update_data };
         if (item.$vnatk_find_options) { $vnatk_find_options = item.$vnatk_find_options; delete item.$vnatk_find_options };
+        if (item.vnatk_update_data) { $vnatk_update_data = item.$vnatk_update_data; delete item.$vnatk_update_data };
 
         if ($vnatk_find_options.modelscope !== undefined) {
             if ($vnatk_find_options.modelscope === false)
@@ -422,6 +423,8 @@ module.exports = {
 
         // do the data for this model, received the ids: Clean everything that do not belongs to model fields first
         item = _.pick(item, _.map(model.rawAttributes, 'fieldName'));
+        if (!item.vnatk_update_data) $vnatk_update_data = item;
+
         let senitizedmodeloptions = { where: Object.assign({}, item) };
         let plainCondition = senitizedmodeloptions;
         if ($vnatk_find_options.modeloptions) {
@@ -469,7 +472,11 @@ module.exports = {
                 item = t;
                 break;
             case 'findandupdateall':
-                // TODO
+                senitizedmodeloptions.transaction = transaction;
+                senitizedmodeloptions.individualHooks = true;
+                t = await model.update($vnatk_update_data, senitizedmodeloptions).catch(err => {
+                    throw err
+                });
                 break;
             case 'findanddeleteall':
                 // TODO
@@ -485,7 +492,7 @@ module.exports = {
                     });
                 } else {
                     let updateReqruied = false;
-                    for (const [field, value] of Object.entries(item)) {
+                    for (const [field, value] of Object.entries($vnatk_update_data)) {
                         if (item[field] !== t.get(field)) {
                             t.set(field, value);
                             updateReqruied = true;
