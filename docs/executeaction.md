@@ -312,6 +312,10 @@ let CreateOrImport = {
                     },
                     modelscope: false,
                 },
+                $vnatk_update_data: {
+                    code: 'PRJ1',
+                    description: 'Project Description',
+                }, 
             },
             {
                 title: 'Project Title 2',

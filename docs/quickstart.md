@@ -85,7 +85,13 @@ const vnatk = require('vnatk-express-sequelize');
 const Models = require('../../models');
 module.exports = vnatk({ 
     Models: Models,
-    router: router
+    router: router,
+    read: true, // Optional, default true
+    create: true, // Optional, default true
+    update: true, // Optional, default true
+    delete: true, // Optional, default true
+    import: true, // Optional, default true
+    actions: true, // Optional, default true
 });
 
 ```
