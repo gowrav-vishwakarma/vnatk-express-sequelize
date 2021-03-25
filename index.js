@@ -21,12 +21,12 @@ module.exports = function (options) {
 
     const Models = options.Models;
     const router = options.router;
-    const allowRead = options.read !== undefined ? true : options.read;
-    const allowCreate = options.create !== undefined ? true : options.create;
-    const allowUpdate = options.update !== undefined ? true : options.update;
-    const allowDelete = options.delete !== undefined ? true : options.delete;
-    const allowImport = options.import !== undefined ? true : options.import;
-    const allowActions = options.actions !== undefined ? true : options.actions;
+    const allowRead = options.read === undefined ? true : options.read;
+    const allowCreate = options.create === undefined ? true : options.create;
+    const allowUpdate = options.update === undefined ? true : options.update;
+    const allowDelete = options.delete === undefined ? true : options.delete;
+    const allowImport = options.import === undefined ? true : options.import;
+    const allowActions = options.actions === undefined ? true : options.actions;
 
     router.post('/crud', async function (req, res, next) {
         var model = Models[req.body.model];
@@ -198,7 +198,7 @@ module.exports = function (options) {
             res.send({ message: 'Import done', response: response });
             return
         } else {
-            if (!allowActions || _.has(model, 'can_' + action.execute) || _.has(model.__proto__, 'can_' + action.execute)) {
+            if (!allowActions && (_.has(model, 'can_' + action.execute) || _.has(model.__proto__, 'can_' + action.execute))) {
                 if (model['can_' + action.execute](req) !== true) {
                     res.status(500).send({ error: true, Message: 'Executing ' + action.execute + ' on model ' + req.body.model + ' is not allowed by authorization functions' });
                     return;
