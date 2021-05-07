@@ -215,7 +215,7 @@ module.exports = function (options) {
             if (req.body.formdata)
                 var response = m_loaded[action.execute](req.body.formdata);
             else
-                var response = m_loaded[action.execute](req.body.arg_item);
+                m_loaded[action.execute](req.body.arg_item);
 
             res.send({ row_data: response ? response : m_loaded });
         }
