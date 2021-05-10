@@ -207,13 +207,15 @@ module.exports = function (options) {
             // is it for : Single, multiple, none, all
             var m_loaded = await model.unscoped();
 
-            if (item && item[model.autoIncrementAttribute])
+            if (item && item[model.autoIncrementAttribute]) {
+                // console.log('loading by id');
                 var m_loaded = await m_loaded.findByPk(item[model.autoIncrementAttribute], senitizedmodeloptions);
+            }
 
             if (req.body.formdata)
                 var response = m_loaded[action.execute](req.body.formdata);
             else
-                m_loaded[action.execute]();
+                m_loaded[action.execute](req.body.arg_item);
 
             res.send({ row_data: response ? response : m_loaded });
         }
