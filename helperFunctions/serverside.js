@@ -159,7 +159,7 @@ module.exports = {
                     module.exports.replaceOperators(obj, key, value);
                 }
 
-                if (typeof (value) === 'object') {
+                if (typeof (value) === 'object' && value !== null) {
                     module.exports.replaceIncludeToObject(value, Models);
                 }
             }
