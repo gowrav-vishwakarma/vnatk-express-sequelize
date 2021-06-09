@@ -212,10 +212,15 @@ module.exports = function (options) {
                 var m_loaded = await m_loaded.findByPk(item[model.autoIncrementAttribute], senitizedmodeloptions);
             }
 
+            var response = undefined;
             if (req.body.formdata)
-                var response = m_loaded[action.execute](req.body.formdata);
+                response = m_loaded[action.execute](req.body.formdata);
+            else if (req.body.importdata)
+                response = m_loaded[action.execute](req.body.importdata);
             else
-                m_loaded[action.execute](req.body.arg_item);
+                response = m_loaded[action.execute](req.body.arg_item);
+
+            response = await Promise.resolve(response);
 
             res.send({ row_data: response ? response : m_loaded });
         }
