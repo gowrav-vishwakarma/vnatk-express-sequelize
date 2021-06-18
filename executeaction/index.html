@@ -73,7 +73,7 @@
     </li>
     <li class="toctree-l3"><a class="reference internal" href="#vnatk_autoimport">vnatk_autoimport</a>
         <ul>
-    <li class="toctree-l4"><a class="reference internal" href="#vnatk_import-example">vnatk_import example</a>
+    <li class="toctree-l4"><a class="reference internal" href="#vnatk_autoimport-example">vnatk_autoimport example</a>
     </li>
         </ul>
     </li>
@@ -268,7 +268,7 @@ Possible values are </p>
 <li><code>$vnatk_cache_records</code>: Under development: To cache any record if already found, to avoid multiple database queires.</li>
 <li><code>$vnatk_update_data</code>: Under development: update values defined here instead all values passed to create if not found.</li>
 </ul>
-<h4 id="vnatk_import-example">vnatk_import example</h4>
+<h4 id="vnatk_autoimport-example">vnatk_autoimport example</h4>
 <p>Lets consider a data structure first, and then import/add/edit data based on VES <code>executeaction</code> api on <code>vnatk_autoimport</code> action.</p>
 <pre><code class="language-javascript">//Gorup.js model
 module.exports = (sequelize, DataTypes) =&gt; {
@@ -403,6 +403,7 @@ let CreateOrImport = {
             modeloptions:{
                 where:{
                     email: 'foo@bar.com'
+                    // group_id: true // To include belongsTo Group's id in where condition, actual Id will be taken in true's place
                 }
             },
             modelacope: false // to avoid any default acope in case
@@ -457,6 +458,10 @@ let CreateOrImport = {
                     },
                     modelscope: false,
                 },
+                $vnatk_update_data: {
+                    code: 'PRJ1',
+                    description: 'Project Description',
+                }, 
             },
             {
                 title: 'Project Title 2',
