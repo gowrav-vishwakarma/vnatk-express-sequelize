@@ -92,6 +92,7 @@ module.exports = vnatk({
     delete: true, // Optional, default true
     import: true, // Optional, default true
     actions: true, // Optional, default true
+    afterExecute(res, model, action, response), //Optional
 });
 
 ```
