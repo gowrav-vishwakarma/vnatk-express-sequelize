@@ -27,6 +27,7 @@ module.exports = function (options) {
     const allowDelete = options.delete === undefined ? true : options.delete;
     const allowImport = options.import === undefined ? true : options.import;
     const allowActions = options.actions === undefined ? true : options.actions;
+    const afterExecute = options.afterExecute === undefined ? false : options.afterExecute;
 
     router.post('/crud', async function (req, res, next) {
         var model = Models[req.body.model];
@@ -135,8 +136,9 @@ module.exports = function (options) {
                     return;
                 }
             }
-            VNATKServerHelpers.createNew(model, item, senitizedmodeloptions).then((cretedRecord) => {
-                res.send({ row_data: cretedRecord, message: 'Record added successfully' });
+            VNATKServerHelpers.createNew(model, item, senitizedmodeloptions).then((createdRecord) => {
+                if (afterExecute) afterExecute(res, model, 'vnatk_add', createdRecord);
+                res.send({ row_data: createdRecord, message: 'Record added successfully' });
                 return;
             }).catch(error => {
                 res.status(VNATKServerHelpers.getErrorCode(error));
@@ -160,6 +162,7 @@ module.exports = function (options) {
                 // res.end();
                 // return next(error);
             });
+            if (afterExecute) afterExecute(res, model, 'vnatk_edit', editedData);
             res.send({ row_data: editedData, message: 'Record edited sucessfully' });
             return;
         }
@@ -181,6 +184,8 @@ module.exports = function (options) {
                 res.status(VNATKServerHelpers.getErrorCode(error));
                 throw error;
             });
+            if (afterExecute) afterExecute(res, model, 'vnatk_delete', where_condition);
+
             res.send({ message: 'Record deleted' });
             return;
         } else if (allowImport && action.name == 'vnatk_autoimport') {
@@ -195,6 +200,8 @@ module.exports = function (options) {
                     res.status(VNATKServerHelpers.getErrorCode(error));
                     return next(error);
                 });
+            if (afterExecute) afterExecute(res, model, 'vnatk_autoimport', response);
+
             res.send({ message: 'Import done', response: response });
             return
         } else {
@@ -221,6 +228,7 @@ module.exports = function (options) {
                 response = m_loaded[action.execute](req.body.arg_item);
 
             response = await Promise.resolve(response);
+            if (afterExecute) afterExecute(res, model, action.execute, response);
 
             res.send({ row_data: response ? response : m_loaded });
         }
