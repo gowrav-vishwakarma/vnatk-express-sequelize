@@ -63,6 +63,8 @@ var postData = {
             },
         },
         group: [{ fn: "DATE", col: "createdAt" }],
+        order: [{ fn: "DATE", col: "createdAt", as:false },'DESC'], // as = false to avoid array wrapping
+        
         },
     },
 };

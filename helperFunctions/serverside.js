@@ -136,7 +136,11 @@ module.exports = {
                 const element = obj[index];
                 module.exports.replaceIncludeToObject(element, Models);
                 if (typeof element == 'object' && _.has(element, 'fn') && _.has(element, 'col')) {
-                    obj[index] = [Models.sequelize.fn(element.fn, Models.sequelize.col(element.col)), element.as ? element.as : element.fn + '_' + element.col];
+                    if (element.as === false) {
+                        obj[index] = Models.sequelize.fn(element.fn, Models.sequelize.col(element.col));
+                    } else {
+                        obj[index] = [Models.sequelize.fn(element.fn, Models.sequelize.col(element.col)), element.as ? element.as : element.fn + '_' + element.col];
+                    }
                 } else if (typeof element == 'object' && _.has(element, 'col')) {
                     obj[index] = Models.sequelize.col(element.col);
                 }
@@ -164,6 +168,8 @@ module.exports = {
                 }
             }
         }
+
+        console.log(obj);
     },
 
     senitizeModelOptions(options, model, Models, skipIdInsert) {
@@ -259,13 +265,15 @@ module.exports = {
         return m_loaded;
     },
 
-    editRecord: async function (model, item, readModelOptions) {
+    editRecord: async function (model, item, readModelOptions, req, res, next, beforeExecute) {
         id = item[model.autoIncrementAttribute];
         delete item[model.autoIncrementAttribute];
         var where_condition = {};
         where_condition[model.autoIncrementAttribute] = id;
         var modelFound = await model.findOne({ where: where_condition });
         if (modelFound) {
+            if (beforeExecute && beforeExecute(modelFound, 'vnatk_edit', req, res, next) === false) return;
+
             const updated = await model.update(item, { where: where_condition, individualHooks: true }).catch(error => {
                 throw error;
             });
