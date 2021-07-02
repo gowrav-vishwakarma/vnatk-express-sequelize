@@ -259,13 +259,15 @@ module.exports = {
         return m_loaded;
     },
 
-    editRecord: async function (model, item, readModelOptions) {
+    editRecord: async function (model, item, readModelOptions, req, res, next, beforeExecute) {
         id = item[model.autoIncrementAttribute];
         delete item[model.autoIncrementAttribute];
         var where_condition = {};
         where_condition[model.autoIncrementAttribute] = id;
         var modelFound = await model.findOne({ where: where_condition });
         if (modelFound) {
+            if (beforeExecute && beforeExecute(modelFound, 'vnatk_edit', req, res, next) === false) return;
+
             const updated = await model.update(item, { where: where_condition, individualHooks: true }).catch(error => {
                 throw error;
             });

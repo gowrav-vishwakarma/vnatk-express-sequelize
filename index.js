@@ -27,11 +27,11 @@ module.exports = function (options) {
     const allowDelete = options.delete === undefined ? true : options.delete;
     const allowImport = options.import === undefined ? true : options.import;
     const allowActions = options.actions === undefined ? true : options.actions;
+    const beforeExecute = options.beforeExecute === undefined ? false : options.beforeExecute;
     const afterExecute = options.afterExecute === undefined ? false : options.afterExecute;
 
     router.post('/crud', async function (req, res, next) {
         var model = Models[req.body.model];
-
         const skipIdInsert = req.body.actions !== undefined && req.body.actions === false;
 
         if (
@@ -54,6 +54,7 @@ module.exports = function (options) {
             if (typeof req.body.read.modelscope === 'string') model = model.scope(req.body.read.modelscope);
         }
 
+        if (beforeExecute && (await Promise.resolve(beforeExecute(model, 'crud', req, res, next))) === false) return;
 
         var ModelActions = [];
         var returnData = {};
@@ -101,6 +102,8 @@ module.exports = function (options) {
         if (allowRead && req.body.read && req.body.read.headers) returnData['headers'] = ModelHeaders;
         if (req.body.actions) returnData['actions'] = ModelActions;
 
+        if (afterExecute) await Promise.resolve(afterExecute(res, model, 'crud', returnData));
+
         res.send(returnData);
     });
 
@@ -112,12 +115,12 @@ module.exports = function (options) {
         var model = Models[req.body.model];
         if (req.body.modelscope !== undefined) {
             if (req.body.modelscope == false) model = model.unscoped();
-            if (typeof req.body.modelscope === 'string') model.scope(req.body.modelscope);
+            if (typeof req.body.modelscope === 'string') model = model.scope(req.body.modelscope);
         }
 
         if (req.body.read && req.body.read.modelscope !== undefined) {
             if (req.body.read.modelscope == false) model = model.unscoped();
-            if (typeof req.body.read.modelscope === 'string') model.scope(req.body.read.modelscope);
+            if (typeof req.body.read.modelscope === 'string') model = model.scope(req.body.read.modelscope);
         }
 
         if (req.body.read && req.body.read.headers) {
@@ -130,14 +133,16 @@ module.exports = function (options) {
         }
 
         if (allowCreate && action.name == 'vnatk_add') {
+            if (beforeExecute && (await Promise.resolve(beforeExecute(model, action.name, req, res, next))) === false) return;
+
             if (_.has(model, 'can_vnatk_add') || _.has(model.__proto__, 'can_vnatk_add')) {
                 if (model.can_vnatk_add(req) !== true) {
                     res.status(500).send({ error: true, Message: 'Adding on model ' + req.body.model + ' is not allowed by authorization functions' });
                     return;
                 }
             }
-            VNATKServerHelpers.createNew(model, item, senitizedmodeloptions).then((createdRecord) => {
-                if (afterExecute) afterExecute(res, model, 'vnatk_add', createdRecord);
+            VNATKServerHelpers.createNew(model, item, senitizedmodeloptions).then(async (createdRecord) => {
+                if (afterExecute) await Promise.resolve(afterExecute(res, model, 'vnatk_add', createdRecord));
                 res.send({ row_data: createdRecord, message: 'Record added successfully' });
                 return;
             }).catch(error => {
@@ -155,14 +160,14 @@ module.exports = function (options) {
                 }
             }
 
-            var editedData = await VNATKServerHelpers.editRecord(model, item, senitizedmodeloptions).catch(error => {
+            var editedData = await VNATKServerHelpers.editRecord(model, item, senitizedmodeloptions, req, res, next, beforeExecute).catch(error => {
                 res.status(VNATKServerHelpers.getErrorCode(error));
                 throw error;
                 // res.send(error);
                 // res.end();
                 // return next(error);
             });
-            if (afterExecute) afterExecute(res, model, 'vnatk_edit', editedData);
+            if (afterExecute) await Promise.resolve(afterExecute(res, model, 'vnatk_edit', editedData));
             res.send({ row_data: editedData, message: 'Record edited sucessfully' });
             return;
         }
@@ -180,11 +185,12 @@ module.exports = function (options) {
                 res.status(VNATKServerHelpers.getErrorCode(error));
                 throw error;
             });
+            if (beforeExecute && (await Promise.resolve(beforeExecute(m_loaded, action.name, req, res, next))) === false) return;
             await m_loaded.destroy().catch(error => {
                 res.status(VNATKServerHelpers.getErrorCode(error));
                 throw error;
             });
-            if (afterExecute) afterExecute(res, model, 'vnatk_delete', where_condition);
+            if (afterExecute) await Promise.resolve(afterExecute(res, model, 'vnatk_delete', where_condition));
 
             res.send({ message: 'Record deleted' });
             return;
@@ -195,12 +201,14 @@ module.exports = function (options) {
                     return;
                 }
             }
+            if (beforeExecute && (await Promise.resolve(beforeExecute(model, action.name, req, res, next))) === false) return;
+
             var response = await VNATKServerHelpers.vnatkAutoImport(model, req.body, Models)
                 .catch(error => {
                     res.status(VNATKServerHelpers.getErrorCode(error));
                     return next(error);
                 });
-            if (afterExecute) afterExecute(res, model, 'vnatk_autoimport', response);
+            if (afterExecute) await Promise.resolve(afterExecute(res, model, 'vnatk_autoimport', response));
 
             res.send({ message: 'Import done', response: response });
             return
@@ -219,6 +227,8 @@ module.exports = function (options) {
                 var m_loaded = await m_loaded.findByPk(item[model.autoIncrementAttribute], senitizedmodeloptions);
             }
 
+            if (beforeExecute && (await Promise.resolve(beforeExecute(m_loaded, action.name, req, res, next))) === false) return;
+
             var response = undefined;
             if (req.body.formdata)
                 response = m_loaded[action.execute](req.body.formdata);
@@ -228,7 +238,7 @@ module.exports = function (options) {
                 response = m_loaded[action.execute](req.body.arg_item);
 
             response = await Promise.resolve(response);
-            if (afterExecute) afterExecute(res, model, action.execute, response);
+            if (afterExecute) await Promise.resolve(afterExecute(res, model, action.execute, response));
 
             res.send({ row_data: response ? response : m_loaded });
         }
