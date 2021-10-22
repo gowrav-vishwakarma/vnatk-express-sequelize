@@ -304,6 +304,8 @@ module.exports = {
             caption: 'Edit',
             type: 'single',
             placeIn: 'buttonGroup',
+            icon: 'mdi-pencil',
+            attributes: { color: "primary" },
             formschema: VNATKClientHelpers.generateFormSchemaFromModel(model, editFields, Models)
         }
         return [editAction];
@@ -314,7 +316,9 @@ module.exports = {
             name: 'vnatk_delete',
             caption: 'Delete',
             type: 'single',
+            icon: 'mdi-delete',
             placeIn: 'buttonGroup',
+            attributes: { color: "error" },
             formschema: {
                 confirm: {
                     type: "checkbox",
