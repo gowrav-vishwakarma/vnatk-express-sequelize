@@ -74,7 +74,13 @@ module.exports = {
                 t['type'] = 'textarea'
                 break
             case 'DATE':
-                t['type'] = 'date-picker'
+                // t['type'] = 'date-picker'
+                t['type'] = 'date'
+                t['ext'] = 'text'
+                t['text'] = {
+                    label: field.caption ? field.caption : field.fieldName,
+                    prependIcon: 'mdi-calendar'
+                }
                 break
             default:
                 t = { type: 'text' };
