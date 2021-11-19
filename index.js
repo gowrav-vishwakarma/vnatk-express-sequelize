@@ -108,6 +108,12 @@ module.exports = function (options) {
     });
 
     router.post('/executeaction', async function (req, res, next) {
+        if (req.body.read && req.body.read.modeloptions && req.body.read.modeloptions.limit) {
+            delete req.body.read.modeloptions.limit;
+            if (req.body.read.modeloptions.offset)
+                delete req.body.read.modeloptions.offset;
+        }
+
         var action = req.body.action_to_execute;
         if (typeof action === 'string' || action instanceof String) action = { name: action, execute: action }
         const item = req.body.arg_item;
@@ -223,10 +229,8 @@ module.exports = function (options) {
             var m_loaded = await model.unscoped();
 
             if (item && item[model.autoIncrementAttribute]) {
-                // console.log('loading by id');
-                var m_loaded = await m_loaded.findByPk(item[model.autoIncrementAttribute], senitizedmodeloptions);
+                m_loaded = await m_loaded.findByPk(item[model.autoIncrementAttribute], senitizedmodeloptions);
             }
-
             if (beforeExecute && (await Promise.resolve(beforeExecute(m_loaded, action.name, req, res, next))) === false) return;
 
             var response = undefined;
