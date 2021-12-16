@@ -731,7 +731,7 @@ module.exports = {
             }
           }
           if (updateReqruied)
-            t = await t.save({ transactio }).catch((err) => {
+            t = await t.save({ transaction }).catch((err) => {
               throw err;
             });
         }
