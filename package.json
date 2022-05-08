@@ -29,6 +29,8 @@
         "helperFunctions/clientside.js",
         "helperFunctions/serverside.js",
         "helperFunctions/modeldesigner.js",
+        "helperFunctions/crud.js",
+        "helperFunctions/executeaction.js",
         "modelDesigner/index.js"
     ],
     "engines": {
