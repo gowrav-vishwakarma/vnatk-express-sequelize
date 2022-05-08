@@ -25,12 +25,12 @@
     "files": [
         "LICENSE",
         "README",
+        "crud.js",
+        "executeaction.js",
         "index.js",
         "helperFunctions/clientside.js",
         "helperFunctions/serverside.js",
         "helperFunctions/modeldesigner.js",
-        "helperFunctions/crud.js",
-        "helperFunctions/executeaction.js",
         "modelDesigner/index.js"
     ],
     "engines": {
